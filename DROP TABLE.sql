@@ -14,4 +14,4 @@ drop table DOCTORS cascade constraints;
 drop table DOCTOR_SPECIALTIES cascade constraints;
 drop table GENDER cascade constraints;
 drop table PROFILE_WORKING_HOURS cascade constraints;
-select * from  gender;
+

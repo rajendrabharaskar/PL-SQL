@@ -66,9 +66,8 @@ create table CHESNOKOV_SE.specialties
     required_gender_id number not null
         references CHESNOKOV_SE.gender(gender_id),
     required_min_age number not null,
-    availability char(20) not null,
-    required_max_age number not null
-
+    required_max_age number not null,
+    delete_dt date
 );
 
 

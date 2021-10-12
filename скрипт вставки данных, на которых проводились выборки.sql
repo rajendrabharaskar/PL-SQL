@@ -53,11 +53,11 @@ insert into gender(gender) values ('Женский');
 insert into gender(gender) values ('Любой');
 
 
-INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, availability, REQUIRED_MAX_AGE) VALUES ('Хирург', 3, 18, 1, 120);
-INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, availability, REQUIRED_MAX_AGE) VALUES ('Терапевт', 3, 18, 0, 120);
-INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, availability, REQUIRED_MAX_AGE) VALUES ('ЛОР', 3, 0, 1, 120);
-INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, availability, REQUIRED_MAX_AGE) VALUES ('Педиатр', 3, 0, 1, 18);
-INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, availability, REQUIRED_MAX_AGE) VALUES ('Гинеколог', 2, 0, 1, 120);
+INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Хирург', 3, 18, 120);
+INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE, DELETE_DT) VALUES ('Терапевт', 3, 18, 120, '20.07.2021');
+INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('ЛОР', 3, 0, 120);
+INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Педиатр', 3, 0, 18);
+INSERT INTO specialties(speciality_name, REQUIRED_GENDER_ID, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Гинеколог', 2, 0, 120);
 
 
 INSERT INTO qualifications(qualification_name, QUALIFICATION_LEVEL) VALUES ('Эксперт', 5);
