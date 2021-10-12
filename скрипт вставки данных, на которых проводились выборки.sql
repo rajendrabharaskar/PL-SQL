@@ -106,3 +106,11 @@ INSERT INTO journal(patient_id, datetime, talon_id) VALUES (1, '30.09.2021', 1);
 INSERT INTO journal(patient_id, datetime, talon_id) VALUES (2, '30.09.2021', 2);
 INSERT INTO journal(patient_id, datetime, talon_id) VALUES (3, '30.09.2021', 3);
 INSERT INTO journal(patient_id, datetime, talon_id, DELETE_DT) VALUES (4, '30.09.2021', 4, '29.09.2021');
+
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (1, 1);
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (1, 2);
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (2, 3);
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (2, 5);
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (3, 1);
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (4, 4);
+insert into DOCTOR_SPECIALTIES(doctor_id, specialty_id) values (5, 1);
