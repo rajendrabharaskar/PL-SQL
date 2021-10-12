@@ -119,7 +119,8 @@ create table CHESNOKOV_SE.hospitals
         references CHESNOKOV_SE.types_hospital(type_id),
     working_hours_id number not null
         references CHESNOKOV_SE.profile_working_hours(profile_working_hours_id),
-    delete_dt date
+    delete_dt date,
+    availability char(20) not null
 );
 
 

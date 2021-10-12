@@ -41,11 +41,11 @@ INSERT INTO types_hospital(type_name) VALUES ('Государственная');
 insert into PROFILE_WORKING_HOURS(monday_start_time, monday_end_time, tuesday_start_time, tuesday_end_time, wednesday_start_time, wednesday_end_time, thursday_start_time, thursday_end_time, friday_start_time, friday_end_time, saturday_start_time, saturday_end_time, sunday_start_time, sunday_end_time) values (28800, 64800, 28800, 64800, 28800, 64800, 28800, 64800, 28800, 64800, 28800, 64800, 28800, 64800);
 
 
-INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID) VALUES ('Больница №1', 2, 2, 1);
-INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID, delete_dt) VALUES ('Больница №2', 3, 1, 1, '28.09.2021');
-INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID) VALUES ('Больница №3', 4, 2, 1);
-INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID) VALUES ('Больница №4', 5, 1, 1);
-INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID) VALUES ('Больница №5', 6, 2, 1);
+INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID, AVAILABILITY) VALUES ('Больница №1', 2, 2, 1,'true');
+INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID, delete_dt, AVAILABILITY) VALUES ('Больница №2', 3, 1, 1, '28.09.2021', 'true');
+INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID, AVAILABILITY) VALUES ('Больница №3', 4, 2, 1, 'true');
+INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID, AVAILABILITY) VALUES ('Больница №4', 5, 1, 1, 'true');
+INSERT INTO hospitals(hospital_name, organization_id, type_id, WORKING_HOURS_ID, AVAILABILITY) VALUES ('Больница №5', 6, 2, 1, 'true');
 
 
 insert into gender(gender) values ('Мужской');
