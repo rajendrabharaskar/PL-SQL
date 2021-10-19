@@ -77,14 +77,24 @@ INSERT INTO hospitals(hospital_name, id_organization, id_type, AVAILABILITY) VAL
 
 insert into genders(gender) values ('Мужской');
 insert into genders(gender) values ('Женский');
-insert into genders(gender) values ('Любой');
 
 
-INSERT INTO specialties(speciality_name, ID_REQUIRED_GENDER, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Хирург', 3, 18, 120);
-INSERT INTO specialties(speciality_name, ID_REQUIRED_GENDER, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE, DELETE_DT) VALUES ('Терапевт', 3, 18, 120, '20.07.2021');
-INSERT INTO specialties(speciality_name, ID_REQUIRED_GENDER, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('ЛОР', 3, 0, 120);
-INSERT INTO specialties(speciality_name, ID_REQUIRED_GENDER, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Педиатр', 3, 0, 18);
-INSERT INTO specialties(speciality_name, ID_REQUIRED_GENDER, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Гинеколог', 2, 0, 120);
+INSERT INTO specialties(speciality_name, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Хирург', 18, 120);
+INSERT INTO specialties(speciality_name, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE, DELETE_DT) VALUES ('Терапевт', 18, 120, '20.07.2021');
+INSERT INTO specialties(speciality_name, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('ЛОР', 0, 120);
+INSERT INTO specialties(speciality_name, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Педиатр', 0, 18);
+INSERT INTO specialties(speciality_name, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE) VALUES ('Гинеколог', 0, 120);
+
+
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (1, 1);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (2, 1);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (1, 2);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (2, 2);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (1, 3);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (2, 3);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (1, 4);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (2, 4);
+insert into GENDER_SPECIALTIES(id_gender, id_speciality) values (2, 5);
 
 
 INSERT INTO qualifications(qualification_name, QUALIFICATION_LEVEL) VALUES ('Эксперт', 5);

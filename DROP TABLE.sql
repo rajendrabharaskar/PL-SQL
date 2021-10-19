@@ -14,4 +14,5 @@ drop table DOCTORS cascade constraints;
 drop table DOCTOR_SPECIALTIES cascade constraints;
 drop table GENDERs cascade constraints;
 drop table WORKING_TIME cascade constraints;
+drop table GENDER_SPECIALTIES;
 
