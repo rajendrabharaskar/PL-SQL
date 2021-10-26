@@ -1,0 +1,24 @@
+declare
+    v_input_area number := 1;
+    v_input_variable number;
+    c_speciality_name SPECIALTIES.SPECIALITY_NAME%type;
+    c_doctor_name doctors.DOCTOR_NAME%type;
+    c_id_hospital HOSPITALS.id_hospital%type;
+    c_qualification_name QUALIFICATIONS.qualification_name%type;
+    c_area_name areas.area_name%type;
+    cursor cursor1 is
+        select doctors.DOCTOR_NAME, ID_HOSPITAL, QUALIFICATION_NAME, AREA_NAME
+        from doctors
+        join QUALIFICATIONS on DOCTORS.ID_QUALIFICATION = QUALIFICATIONS.ID_QUALIFICATION
+        join AREAS  on AREAS.ID_AREA = DOCTORS.ID_AREA
+        where ((DOCTORS.DELETE_DT is null) and (DOCTORS.ID_HOSPITAL = 1)) and ((doctors.ID_DOCTOR = v_input_variable and v_input_variable is not null) or v_input_variable is null)
+        order by QUALIFICATION_LEVEL desc, (case when DOCTORS.ID_AREA = v_input_area then 1 else 2 end);
+begin
+    OPEN cursor1;
+        LOOP
+        FETCH cursor1 into c_doctor_name, c_id_hospital, c_qualification_name, c_area_name;
+           EXIT WHEN cursor1%notfound;
+           dbms_output.put_line(c_doctor_name || ' ' || c_id_hospital || ' ' || c_qualification_name || ' ' || c_area_name);
+        END LOOP;
+        CLOSE cursor1;
+end;

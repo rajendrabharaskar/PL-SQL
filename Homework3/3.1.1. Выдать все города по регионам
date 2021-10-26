@@ -1,0 +1,18 @@
+declare
+    v_input_variable number :=2;
+    c_region_name REGIONS.region_name%type;
+    c_city_name CITIES.city_name%type;
+    cursor cursor1 is
+        select REGION_NAME, CITY_NAME
+        from CITIES
+        inner join REGIONS on CHESNOKOV_SE.REGIONS.ID_REGION = CITIES.ID_REGION
+        where (regions.id_region = v_input_variable and v_input_variable is not null) or v_input_variable is null;
+begin
+    OPEN cursor1;
+        LOOP
+        FETCH cursor1 into c_region_name, c_city_name;
+           EXIT WHEN cursor1%notfound;
+           dbms_output.put_line(c_region_name || ' '  || c_city_name);
+        END LOOP;
+        CLOSE cursor1;
+end;

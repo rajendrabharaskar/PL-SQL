@@ -1,0 +1,21 @@
+ declare
+    v_input_variable number := 1;
+    c_hospital_name HOSPITALS.HOSPITAL_NAME%type;
+    c_day WORKING_TIME.DAY%type;
+     c_begin_time WORKING_TIME.BEGIN_TIME%type;
+     c_end_time WORKING_TIME.END_TIME%type;
+    cursor cursor1 is
+        select HOSPITALS.HOSPITAL_NAME, WORKING_TIME.DAY, WORKING_TIME.BEGIN_TIME, WORKING_TIME.END_TIME
+        from HOSPITALS
+        join WORKING_TIME on HOSPITALS.ID_HOSPITAL = WORKING_TIME.ID_HOSPITAL
+        where (HOSPITALS.ID_HOSPITAL = v_input_variable and v_input_variable is not null) or v_input_variable is null
+        order by HOSPITALS.HOSPITAL_NAME, WORKING_TIME.DAY;
+begin
+    OPEN cursor1;
+        LOOP
+        FETCH cursor1 into c_hospital_name, c_day, c_begin_time, c_end_time;
+           EXIT WHEN cursor1%notfound;
+           dbms_output.put_line(c_hospital_name || ' ' || c_day || ' ' || c_begin_time || ' ' || c_end_time);
+        END LOOP;
+        CLOSE cursor1;
+end;

@@ -1,0 +1,19 @@
+declare
+    v_input_variable number := 1;
+    c_id_patient JOURNAL.ID_PATIENT%type;
+    c_datetime JOURNAL.DATETIME%type;
+    c_id_talon JOURNAL.ID_TALON%type;
+    c_AVAILABILITY JOURNAL.AVAILABILITY%type;
+    cursor cursor1 is
+        select ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY
+        from JOURNAL
+        where (ID_PATIENT = v_input_variable and v_input_variable is not null) or v_input_variable is null;
+begin
+    OPEN cursor1;
+        LOOP
+        FETCH cursor1 into c_id_patient, c_datetime, c_id_talon,c_AVAILABILITY;
+           EXIT WHEN cursor1%notfound;
+           dbms_output.put_line(c_id_patient || ' ' || c_datetime || ' ' || c_id_talon || ' ' || c_AVAILABILITY);
+        END LOOP;
+        CLOSE cursor1;
+end;

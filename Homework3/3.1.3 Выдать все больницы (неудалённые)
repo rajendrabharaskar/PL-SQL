@@ -4,6 +4,7 @@ begin
     select to_char (sysdate, 'D') into v_today from dual;
 
 declare
+    v_input_variable number;
     c_hospital_name HOSPITALS.HOSPITAL_NAME%type;
     c_availability HOSPITALS.AVAILABILITY%type;
     c_id_doctor number;
@@ -17,7 +18,7 @@ declare
     right outer join DOCTOR_SPECIALTIES on DOCTORS.ID_DOCTOR = DOCTOR_SPECIALTIES.ID_DOCTOR
     join TYPES_HOSPITAL on HOSPITALS.ID_TYPE = TYPES_HOSPITAL.ID_TYPE
     join WORKING_TIME on (HOSPITALS.ID_HOSPITAL = WORKING_TIME.ID_HOSPITAL) and (WORKING_TIME.DAY = v_today)
-    where (HOSPITALS.DELETE_DT is null) and (DOCTOR_SPECIALTIES.ID_SPECIALTY = 1)
+    where ((HOSPITALS.DELETE_DT is null) and (DOCTOR_SPECIALTIES.ID_SPECIALTY = 1)) and ((HOSPITALS.ID_HOSPITAL = v_input_variable and v_input_variable is not null) or v_input_variable is null)
     group by HOSPITAL_NAME, hospitals.AVAILABILITY, HOSPITALS.HOSPITAL_NAME, TYPES_HOSPITAL.ID_TYPE, TYPES_HOSPITAL.TYPE_NAME, WORKING_TIME.BEGIN_TIME, WORKING_TIME.END_TIME
     order by TYPES_HOSPITAL.ID_TYPE, count(distinct DOCTORS.ID_DOCTOR) desc, (case when to_char(sysdate, 'hh24:mi:ss') between to_char(WORKING_TIME.BEGIN_TIME, 'hh24:mi:ss') and to_char(WORKING_TIME.END_TIME, 'hh24:mi:ss' ) then 1 else 2 end);
 

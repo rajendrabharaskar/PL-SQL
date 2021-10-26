@@ -1,0 +1,16 @@
+ declare
+    v_input_variable number;
+    c_id_talon TALONS.ID_TALON%type;
+    cursor cursor1 is
+        SELECT ID_TALON
+        FROM TALONS
+        WHERE (start_date >= SYSDATE) and  ((id_doctor = 5 and v_input_variable is not null) or v_input_variable is null);
+begin
+    OPEN cursor1;
+        LOOP
+        FETCH cursor1 into c_id_talon;
+           EXIT WHEN cursor1%notfound;
+           dbms_output.put_line(c_id_talon);
+        END LOOP;
+        CLOSE cursor1;
+end;
