@@ -132,12 +132,27 @@ INSERT INTO USERS(login) VALUES ('lifer');
 INSERT INTO USERS(login) VALUES ('rbq');
 
 
-INSERT INTO patients(surname, name, middle_name, date_birth, serial_doc, id_gender, phone_number, id_area, id_user) values ('Тройский', 'Алексей', 'андреевич', '17.05.1995', 123433, 1, 79991234567, 1, 1);
-INSERT INTO patients(surname, name, middle_name, date_birth, serial_doc, id_gender, phone_number, id_area, id_user) values ('Иванов', 'Алексей', 'андреевич', '07.03.1993', 123663, 1, 79991234567, 2, 2);
-INSERT INTO patients(surname, name, middle_name, date_birth, serial_doc, id_gender, phone_number, id_area, id_user) values ('Петров', 'Алексей', 'андреевич', '13.04.1992', 127723, 1, 79991234567, 3, 3);
-INSERT INTO patients(surname, name, middle_name, date_birth, serial_doc, id_gender, phone_number, id_area, id_user) values ('Баженов', 'Евгений', 'Владимирович', '24.05.1991', 128123, 1, 79991234567, 4, 4);
-INSERT INTO patients(surname, name, middle_name, date_birth, serial_doc, id_gender, phone_number, id_area, id_user) values ('Куплинов', 'Дмитрий', 'Алексеевич', '25.11.1988', 129923, 1, 79991234567, 5, 5);
+INSERT INTO patients(surname, name, middle_name, date_birth, id_gender, phone_number, id_area, id_user) values ('Тройский', 'Алексей', 'андреевич', '17.05.1995', 1, 79991234567, 1, 1);
+INSERT INTO patients(surname, name, middle_name, date_birth, id_gender, phone_number, id_area, id_user) values ('Иванов', 'Алексей', 'андреевич', '07.03.1993', 1, 79991234567, 2, 2);
+INSERT INTO patients(surname, name, middle_name, date_birth, id_gender, phone_number, id_area, id_user) values ('Петров', 'Алексей', 'андреевич', '13.04.1992', 1, 79991234567, 3, 3);
+INSERT INTO patients(surname, name, middle_name, date_birth, id_gender, phone_number, id_area, id_user) values ('Баженов', 'Евгений', 'Владимирович', '24.05.1991', 1, 79991234567, 4, 4);
+INSERT INTO patients(surname, name, middle_name, date_birth, id_gender, phone_number, id_area, id_user) values ('Куплинов', 'Дмитрий', 'Алексеевич', '25.11.1988', 1, 79991234567, 5, 5);
 
+
+insert into DOCUMENTS(NAME) values ('Паспорт');
+insert into DOCUMENTS(name) values ('СНИЛС');
+
+
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (1,1,'3214 127223');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (1,2,'741963');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (2,1,'3211 849312');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (2,2,'946825');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (3,1,'2275 654821');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (3,2,'394567');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (4,1,'5826 753159');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (4,2,'785212');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (5,1,'9852 356322');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (5,2,'741236');
 
 INSERT INTO journal(id_patient, datetime, id_talon, availability ) VALUES (1, '30.09.2021', 1, 1);
 INSERT INTO journal(id_patient, datetime, id_talon, availability ) VALUES (2, '30.09.2021', 2, 1);
