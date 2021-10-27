@@ -17,4 +17,4 @@ drop table WORKING_TIME cascade constraints;
 drop table GENDER_SPECIALTIES cascade constraints;
 drop table documents cascade constraints;
 drop table documents_numbers cascade constraints;
-
+drop table REVIEWS cascade constraints;

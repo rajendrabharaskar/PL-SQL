@@ -111,11 +111,24 @@ INSERT INTO AREAS(area_name) VALUES ('Четвертый');
 INSERT INTO AREAS(area_name) VALUES ('Пятый');
 
 
-INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name) VALUES (1, 1, 3, 'Пермяков Иван');
-INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name, DELETE_DT) VALUES (2, 2, 4, 'Иванов Иван', '15.06.2020');
-INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name) VALUES (3, 3, 5, 'Андреев Иван');
-INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name) VALUES (4, 4, 5, 'Ступкин Иван');
-INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name) VALUES (5, 5, 1, 'Резцов Дмитрий');
+INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name, salary, education) VALUES (1, 1, 3, 'Пермяков Иван', 70000, 'НГМУ');
+INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name, salary, education, DELETE_DT) VALUES (2, 2, 4, 'Иванов Иван',65020,'НГМА' ,'15.06.2020');
+INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name, salary, education) VALUES (3, 3, 5, 'Андреев Иван',65020,'НГМА');
+INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name, salary, education) VALUES (4, 4, 5, 'Ступкин Иван',44530,'НГМА');
+INSERT INTO DOCTORS(id_hospital, id_area, id_qualification, doctor_name, salary, education) VALUES (5, 5, 1, 'Резцов Дмитрий',45020,'НГМА');
+
+
+Insert into REVIEWS(id_doctor, review, rating) values (1, 'Всё хорошо', 5);
+Insert into REVIEWS(id_doctor, review, rating) values (1, 'Всё плохо', 1);
+Insert into REVIEWS(id_doctor, review, rating) values (2, 'хам и грубиян!!!!!', 1);
+Insert into REVIEWS(id_doctor, review, rating) values (3, 'неопытный, что-то на больничном', 4);
+Insert into REVIEWS(id_doctor, rating) values (4, 5);
+Insert into REVIEWS(id_doctor, rating) values (5, 5);
+Insert into REVIEWS(id_doctor, rating) values (5, 5);
+Insert into REVIEWS(id_doctor, rating) values (5, 5);
+Insert into REVIEWS(id_doctor, rating) values (4,  5);
+
+
 
 
 INSERT INTO TALONS(START_date, end_date, id_doctor, availability ) VALUES ('28.09.2021', '17.10.2021', 1, 1);
