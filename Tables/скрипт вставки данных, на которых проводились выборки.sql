@@ -154,6 +154,7 @@ INSERT INTO patients(surname, name, middle_name, date_birth, id_gender, phone_nu
 
 insert into DOCUMENTS(NAME) values ('Паспорт');
 insert into DOCUMENTS(name) values ('СНИЛС');
+insert into DOCUMENTS(name) values ('Полис ОМС');
 
 
 INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (1,1,'3214 127223');
@@ -166,6 +167,7 @@ INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (4,1,'5826
 INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (4,2,'785212');
 INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (5,1,'9852 356322');
 INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (5,2,'741236');
+INsert into DOCUMENTS_NUMBERS (ID_PATIENT, ID_DOCUMENT, VALUE) values (1,3,'741236');
 
 INSERT INTO journal(id_patient, datetime, id_talon, availability ) VALUES (1, '30.09.2021', 1, 1);
 INSERT INTO journal(id_patient, datetime, id_talon, availability ) VALUES (2, '30.09.2021', 2, 1);
