@@ -1,0 +1,54 @@
+create package pkg_all_cities as
+    function f_all_cities (v_input_id in number) return sys_refcursor;
+    function f_all_cities return sys_refcursor;
+end;
+create package body pkg_all_cities as
+    function f_all_cities (v_input_id in number)
+    return sys_refcursor
+    as
+        cursor1 sys_refcursor;
+    begin
+        OPEN cursor1 for
+            select REGION_NAME, CITY_NAME
+            from CITIES
+            inner join REGIONS on CHESNOKOV_SE.REGIONS.ID_REGION = CITIES.ID_REGION
+            where regions.id_region = v_input_id;
+        return cursor1;
+    end;
+
+    function f_all_cities
+    return sys_refcursor
+    as
+        cursor1 sys_refcursor;
+    begin
+        OPEN cursor1 for
+            select REGION_NAME, CITY_NAME
+            from CITIES
+            inner join REGIONS on CHESNOKOV_SE.REGIONS.ID_REGION = CITIES.ID_REGION;
+        return cursor1;
+    end;
+end;
+
+declare
+    c_region_name REGIONS.region_name%type;
+    c_city_name CITIES.city_name%type;
+    v_cursor sys_refcursor;
+    v_cursor2 sys_refcursor;
+begin
+    v_cursor := pkg_all_cities.F_ALL_CITIES();
+    v_cursor2 := pkg_all_cities.F_ALL_CITIES(2);
+    LOOP
+        FETCH v_cursor into c_region_name, c_city_name;
+        EXIT WHEN v_cursor%notfound;
+        dbms_output.put_line(c_region_name || ' '  || c_city_name);
+    END LOOP;
+    close v_cursor;
+    dbms_output.put_line('---Начало второго курсорв---');
+    LOOP
+        FETCH v_cursor2 into c_region_name, c_city_name;
+        EXIT WHEN v_cursor2%notfound;
+        dbms_output.put_line(c_region_name || ' '  || c_city_name);
+    END LOOP;
+    close v_cursor2;
+end;
+
