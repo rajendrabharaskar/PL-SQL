@@ -1,0 +1,55 @@
+create package pkg_all_specialitys as
+    function f_all_specialitys return sys_refcursor;
+    function f_all_specialitys(v_input_id number) return sys_refcursor;
+end;
+create package body pkg_all_specialitys as
+    function f_all_specialitys
+    return sys_refcursor
+    as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        SELECT DISTINCT SPECIALITY_NAME
+        FROM specialties
+        inner join DOCTOR_SPECIALTIES on SPECIALTIES.ID_SPECIALTY = DOCTOR_SPECIALTIES.ID_SPECIALTY
+        inner join DOCTORS on DOCTOR_SPECIALTIES.ID_DOCTOR = DOCTORS.ID_DOCTOR
+        inner join HOSPITALS on DOCTORS.ID_HOSPITAL= HOSPITALS.ID_HOSPITAL
+        WHERE (SPECIALTIES.DELETE_DT IS NULL) and (DOCTORS.DELETE_DT is null) and (HOSPITALS.DELETE_DT is null);
+        return cursor1;
+    end;
+
+    function f_all_specialitys(v_input_id number)
+    return sys_refcursor
+    as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        SELECT DISTINCT SPECIALITY_NAME
+        FROM specialties
+        inner join DOCTOR_SPECIALTIES on SPECIALTIES.ID_SPECIALTY = DOCTOR_SPECIALTIES.ID_SPECIALTY
+        inner join DOCTORS on DOCTOR_SPECIALTIES.ID_DOCTOR = DOCTORS.ID_DOCTOR
+        inner join HOSPITALS on DOCTORS.ID_HOSPITAL= HOSPITALS.ID_HOSPITAL
+        WHERE (SPECIALTIES.DELETE_DT IS NULL) and (DOCTORS.DELETE_DT is null) and (HOSPITALS.DELETE_DT is null) and (SPECIALTIES.ID_SPECIALTY = v_input_id);
+        return cursor1;
+    end;
+end;
+
+declare
+    c_speciality_name SPECIALTIES.SPECIALITY_NAME%type;
+    v_cursor1 sys_refcursor;
+    v_cursor2 sys_refcursor;
+begin
+    v_cursor1 := pkg_all_specialitys.f_all_specialitys();
+    v_cursor2 := pkg_all_specialitys.F_ALL_SPECIALITYS(1);
+        LOOP
+        FETCH v_cursor1 into c_speciality_name;
+           EXIT WHEN v_cursor1%notfound;
+           dbms_output.put_line(c_speciality_name);
+        END LOOP;
+    CLOSE v_cursor1;
+    dbms_output.put_line('------------------------------------------------');
+        LOOP
+        FETCH v_cursor2 into c_speciality_name;
+           EXIT WHEN v_cursor2%notfound;
+           dbms_output.put_line(c_speciality_name);
+        END LOOP;
+    CLOSE v_cursor2;
+end;
