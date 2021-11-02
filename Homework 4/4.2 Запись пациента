@@ -1,0 +1,89 @@
+CREATE Function f_appointment(v_id_patient in number, v_datetime in date, v_id_talon in number)
+   RETURN char
+IS
+   result_appointment char;
+BEGIN
+    if v_id_patient not in CHESNOKOV_SE.PATIENTS.ID_PATIENT
+        then return 'Неверный ID пациента';
+    end if;
+    if v_id_talon not in CHESNOKOV_SE.TALONS.ID_TALON
+        then return 'Неверный ID талона';
+    end if;
+    declare
+        talon_time_begin date;
+        talon_time_end date;
+        id_patient_on_talon number;
+        id_gender_patient number;
+        id_gender_speciality number;
+        required_min_age number;
+        required_max_age number;
+        cursor1 sys_refcursor;
+        count_lucky number := 0;
+        age_patient number;
+        date_birth date;
+        availability number;
+        doc_del date;
+        spec_del date;
+        hosp_del date;
+    begin
+        select CHESNOKOV_SE.TALONS.START_DATE
+            into talon_time_begin
+            from  chesnokov_se.TALONS;
+        select CHESNOKOV_SE.TALONS.END_DATE
+            into talon_time_end
+            from  chesnokov_se.TALONS;
+        if v_datetime not between talon_time_begin and talon_time_end
+            then return 'Неверный время для указанного талона';
+        end if;
+        if talon_time_begin > sysdate
+            then return 'Неверное время';
+        end if;
+        select CHESNOKOV_SE.JOURNAL.ID_PATIENT
+            into id_patient_on_talon
+            from CHESNOKOV_SE.JOURNAL
+            where chesnokov_se.JOURNAL.ID_TALON = v_id_talon;
+        if id_patient_on_talon = v_id_patient
+            then return 'Пациент уже записан в этот талон';
+        end if;
+        select CHESNOKOV_SE.PATIENTS.ID_GENDER
+            into id_gender_patient
+            from PATIENTS
+            where CHESNOKOV_SE.PATIENTS.ID_PATIENT = v_id_patient;
+        select CHESNOKOV_SE.PATIENTS.DATE_BIRTH
+            into date_birth
+            from PATIENTS
+            where PATIENTS.ID_PATIENT = v_id_patient;
+        select months_between(TRUNC(sysdate),date_birth)/12
+            into age_patient
+            from dual;
+        select CHESNOKOV_SE.TALONS.AVAILABILITY
+            into availability
+            from TALONS
+            where TALONS.ID_TALON = v_id_talon;
+        if availability = 0
+            then return 'Талон закрыт';
+        end if;
+        open cursor1 for
+            select distinct GENDER_SPECIALTIES.ID_GENDER, SPECIALTIES.REQUIRED_MIN_AGE, SPECIALTIES.REQUIRED_MAX_AGE, DOCTORS.DELETE_DT, SPECIALTIES.DELETE_DT, HOSPITALS.DELETE_DT
+                from CHESNOKOV_SE.TALONS
+                join DOCTORS on DOCTORS.ID_DOCTOR = TALONS.ID_DOCTOR
+                join HOSPITALS on HOSPITALS.ID_HOSPITAL = DOCTORS.ID_HOSPITAL
+                join DOCTOR_SPECIALTIES on DOCTORS.ID_DOCTOR = DOCTOR_SPECIALTIES.ID_DOCTOR
+                join SPECIALTIES on SPECIALTIES.ID_SPECIALTY = DOCTOR_SPECIALTIES.ID_SPECIALTY
+                join GENDER_SPECIALTIES on SPECIALTIES.ID_SPECIALTY = GENDER_SPECIALTIES.ID_SPECIALITY
+                where v_id_talon = TALONS.ID_TALON;
+            LOOP
+                FETCH cursor1 into id_gender_speciality, required_min_age, required_max_age, doc_del, spec_del, hosp_del;
+                EXIT WHEN cursor1%notfound;
+                if (id_gender_speciality = id_gender_patient) and (age_patient between required_min_age and required_max_age) and doc_del is null and spec_del is null and hosp_del is null
+                   then count_lucky := count_lucky + 1;
+                end if;
+            END LOOP;
+            if count_lucky = 0
+                    then return 'Не подходящий пол или возвраст или что-то удалено';
+            end if;
+        close cursor1;
+    end;
+    insert into CHESNOKOV_SE.JOURNAL(ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY) values (v_id_patient, v_datetime, v_id_talon, 0);
+    RETURN 'Строка успешна вставлена';
+END f_appointment;
