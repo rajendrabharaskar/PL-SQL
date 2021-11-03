@@ -1,0 +1,71 @@
+create or replace package pkg_all_journal as
+    function f_all_journal return sys_refcursor;
+    function f_all_journal(v_input_id number) return sys_refcursor;
+end;
+create or replace package body pkg_all_journal as
+    function f_all_journal
+        return sys_refcursor
+        as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        select ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY
+        from JOURNAL;
+        return cursor1;
+    end;
+
+    function f_all_journal(v_input_id number)
+        return sys_refcursor
+        as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        select ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY
+        from JOURNAL
+        where ID_PATIENT = v_input_id;
+        return cursor1;
+    end;
+end;
+
+declare
+    v_id_patient JOURNAL.ID_PATIENT%type;
+    v_datetime JOURNAL.DATETIME%type;
+    v_id_talon JOURNAL.ID_TALON%type;
+    v_AVAILABILITY JOURNAL.AVAILABILITY%type;
+    v_cursor1 sys_refcursor;
+    v_cursor2 sys_refcursor;
+begin
+    v_cursor1 := pkg_all_journal.f_all_journal();
+    v_cursor2 := pkg_all_journal.f_all_journal(1);
+        LOOP
+        FETCH v_cursor1 into v_id_patient, v_datetime, v_id_talon, v_AVAILABILITY;
+           EXIT WHEN v_cursor1%notfound;
+           dbms_output.put_line( v_id_patient || ' ' || v_datetime || ' ' || v_id_talon || ' ' || v_AVAILABILITY);
+        END LOOP;
+    CLOSE v_cursor1;
+    dbms_output.put_line('------------------------------------------------');
+        LOOP
+        FETCH v_cursor2 into v_id_patient, v_datetime, v_id_talon, v_AVAILABILITY;
+           EXIT WHEN v_cursor2%notfound;
+           dbms_output.put_line( v_id_patient || ' ' || v_datetime || ' ' || v_id_talon || ' ' || v_AVAILABILITY);
+        END LOOP;
+    CLOSE v_cursor2;
+end;
+
+declare
+    v_input_variable number := 1;
+    c_id_patient JOURNAL.ID_PATIENT%type;
+    c_datetime JOURNAL.DATETIME%type;
+    c_id_talon JOURNAL.ID_TALON%type;
+    c_AVAILABILITY JOURNAL.AVAILABILITY%type;
+    cursor cursor1 is
+        select ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY
+        from JOURNAL
+        where (ID_PATIENT = v_input_variable and v_input_variable is not null) or v_input_variable is null;
+begin
+    OPEN cursor1;
+        LOOP
+        FETCH cursor1 into c_id_patient, c_datetime, c_id_talon,c_AVAILABILITY;
+           EXIT WHEN cursor1%notfound;
+           dbms_output.put_line(c_id_patient || ' ' || c_datetime || ' ' || c_id_talon || ' ' || c_AVAILABILITY);
+        END LOOP;
+        CLOSE cursor1;
+end;
