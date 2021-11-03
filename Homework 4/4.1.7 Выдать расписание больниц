@@ -1,0 +1,56 @@
+create or replace package pkg_all_work_time as
+    function f_all_work_time return sys_refcursor;
+    function f_all_work_time(v_input_id number) return sys_refcursor;
+end;
+create or replace package body pkg_all_work_time as
+    function f_all_work_time
+        return sys_refcursor
+        as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        select HOSPITALS.HOSPITAL_NAME, WORKING_TIME.DAY, WORKING_TIME.BEGIN_TIME, WORKING_TIME.END_TIME
+        from HOSPITALS
+        join WORKING_TIME on HOSPITALS.ID_HOSPITAL = WORKING_TIME.ID_HOSPITAL
+        order by HOSPITALS.HOSPITAL_NAME, WORKING_TIME.DAY;
+        return cursor1;
+    end;
+
+    function f_all_work_time(v_input_id number)
+        return sys_refcursor
+        as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        select HOSPITALS.HOSPITAL_NAME, WORKING_TIME.DAY, WORKING_TIME.BEGIN_TIME, WORKING_TIME.END_TIME
+        from HOSPITALS
+        join WORKING_TIME on HOSPITALS.ID_HOSPITAL = WORKING_TIME.ID_HOSPITAL
+        where HOSPITALS.ID_HOSPITAL = v_input_id
+        order by HOSPITALS.HOSPITAL_NAME, WORKING_TIME.DAY;
+        return cursor1;
+    end;
+end;
+
+declare
+    v_hospital_name HOSPITALS.HOSPITAL_NAME%type;
+    v_day WORKING_TIME.DAY%type;
+    v_begin_time WORKING_TIME.BEGIN_TIME%type;
+    v_end_time WORKING_TIME.END_TIME%type;
+    v_cursor1 sys_refcursor;
+    v_cursor2 sys_refcursor;
+begin
+    v_cursor1 := pkg_all_work_time.f_all_work_time();
+    v_cursor2 := pkg_all_work_time.f_all_work_time(1);
+        LOOP
+        FETCH v_cursor1 into v_hospital_name, v_day, v_begin_time, v_end_time;
+           EXIT WHEN v_cursor1%notfound;
+           dbms_output.put_line( v_hospital_name || ' ' || v_day || ' ' || v_begin_time || ' ' || v_end_time);
+        END LOOP;
+    CLOSE v_cursor1;
+    dbms_output.put_line('------------------------------------------------');
+        LOOP
+        FETCH v_cursor2 into v_hospital_name, v_day, v_begin_time, v_end_time;
+           EXIT WHEN v_cursor2%notfound;
+           dbms_output.put_line( v_hospital_name || ' ' || v_day || ' ' || v_begin_time || ' ' || v_end_time);
+        END LOOP;
+    CLOSE v_cursor2;
+end;
+
