@@ -1,0 +1,65 @@
+CREATE or replace Function f_cancel_appointment(v_id_journal number)
+   RETURN char
+as
+    date_appointment date;
+    end_time_hospital date;
+    today_day_of_week number;
+    checktemp number := 0;
+    id_talon_journal number;
+begin
+    select count(CHESNOKOV_SE.JOURNAL.ID_JORNAL)
+        into checktemp
+        from CHESNOKOV_SE.JOURNAL
+        where CHESNOKOV_SE.JOURNAL.ID_JORNAL = v_id_journal;
+    if checktemp = 0
+        then return 'Не верный ID талона';
+    end if;
+
+    checktemp := 0;
+    select CHESNOKOV_SE.JOURNAL.AVAILABILITY
+        into checktemp
+        from CHESNOKOV_SE.JOURNAL
+        where CHESNOKOV_SE.JOURNAL.ID_JORNAL = v_id_journal;
+    if checktemp = 0
+        then return 'Данная запись уже отменена';
+    end if;
+
+
+    select CHESNOKOV_SE.JOURNAL.DATETIME
+        into date_appointment
+        from CHESNOKOV_SE.JOURNAL
+        where CHESNOKOV_SE.JOURNAL.ID_JORNAL = v_id_journal;
+    if date_appointment < sysdate
+        then return 'Приём уже начался, отменить невозможно';
+    end if;
+
+    select to_char (sysdate, 'D') d
+    into today_day_of_week
+    from dual;
+    select CHESNOKOV_SE.WORKING_TIME.END_TIME
+        into end_time_hospital
+        from JOURNAL
+        join TALONS on JOURNAL.ID_TALON = TALONS.ID_TALON
+        join DOCTORS on TALONS.ID_DOCTOR = DOCTORS.ID_DOCTOR
+        join WORKING_TIME on DOCTORS.ID_HOSPITAL = WORKING_TIME.ID_HOSPITAL
+        where CHESNOKOV_SE.JOURNAL.ID_JORNAL = v_id_journal and WORKING_TIME.DAY = today_day_of_week;
+    if ((sysdate - trunc(sysdate)) * 24) > (((end_time_hospital - trunc(end_time_hospital)) * 24) - 2)
+        then return 'До окончания рабочего дня меньше 2 часа';
+    end if;
+
+    select CHESNOKOV_SE.JOURNAL.ID_TALON
+        into id_talon_journal
+        from CHESNOKOV_SE.JOURNAL
+        where CHESNOKOV_SE.JOURNAL.ID_JORNAL = v_id_journal;
+    update TALONS
+        set TALONS.AVAILABILITY = 1
+        where CHESNOKOV_SE.TALONS.ID_TALON = id_talon_journal;
+    update JOURNAL
+        set JOURNAL.AVAILABILITY = 0
+        where CHESNOKOV_SE.JOURNAL.ID_JORNAL = id_talon_journal;
+    return 'Запись отменена';
+end;
+
+begin
+    dbms_output.put_line(f_cancel_appointment(19));
+end;

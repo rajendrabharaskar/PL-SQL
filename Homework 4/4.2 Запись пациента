@@ -53,12 +53,12 @@ BEGIN
     select count(CHESNOKOV_SE.JOURNAL.ID_PATIENT) --Проверка записи на этот талон этим пациентом
         into checkid
         from CHESNOKOV_SE.JOURNAL
-        where chesnokov_se.JOURNAL.ID_TALON = v_id_talon;
+        where chesnokov_se.JOURNAL.ID_TALON = v_id_talon and CHESNOKOV_SE.JOURNAL.AVAILABILITY = 1;
     if checkid > 0
         then return 'Пациент уже записан в этот талон';
     end if;
 
-    select CHESNOKOV_SE.TALONS.AVAILABILITY --ПРоверка доступности талона
+    select CHESNOKOV_SE.TALONS.AVAILABILITY --Проверка доступности талона
         into availability
         from TALONS
         where TALONS.ID_TALON = v_id_talon;
@@ -107,7 +107,7 @@ BEGIN
         end if;
     close cursor1;
 
-    insert into CHESNOKOV_SE.JOURNAL(ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY) values (v_id_patient, v_datetime, v_id_talon, 0);
+    insert into CHESNOKOV_SE.JOURNAL(ID_PATIENT, DATETIME, ID_TALON, AVAILABILITY) values (v_id_patient, v_datetime, v_id_talon, 1);
     update TALONS
         set TALONS.AVAILABILITY = 0
         where ID_TALON = v_id_talon;
@@ -115,5 +115,5 @@ BEGIN
 END f_appointment;
 
 begin
-      dbms_output.put_line( f_appointment(1,to_date('07-11-2021','DD-MM-YYYY'),6));
+      dbms_output.put_line( f_appointment(1,to_date('07-11-2021 16:00','DD-MM-YYYY HH24:MI'),6));
 end;
