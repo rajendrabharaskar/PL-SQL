@@ -120,6 +120,7 @@ create table CHESNOKOV_SE.working_time
     begin_time timestamp not null,
     end_time timestamp not null,
     id_hospital number not null
+        references  CHESNOKOV_SE.hospitals(id_hospital)
 );
 
 
