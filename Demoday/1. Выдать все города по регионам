@@ -3,10 +3,10 @@ as
     v_region_name regions.region_name%type;
     v_city_name cities.city_name%type;
     cursor c_cities_by_region is
-        select region_name, city_name
-        from CITIES
-        inner join regions on chesnokov_se.regions.id_region = cities.id_region
-        where (regions.id_region = in_id_region and in_id_region is not null) or in_id_region is null;
+        select regions.region_name, cities.city_name
+            from chesnokov_se.cities
+            join chesnokov_se.regions on regions.id_region = cities.id_region
+            where (regions.id_region = in_id_region and in_id_region is not null) or in_id_region is null;
 begin
     open c_cities_by_region;
         loop
