@@ -1,4 +1,4 @@
-create or replace procedure chesnokov_se.cities_of_region_by_id(in_id_region number)
+create or replace procedure chesnokov_se.cities_of_region_by_id(in_id_region in number)
 as
     v_region_name regions.region_name%type;
     v_city_name cities.city_name%type;

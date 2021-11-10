@@ -1,4 +1,4 @@
-create or replace procedure chesnokov_se.speciality_by_doctor_id(in_id_doctor number)
+create or replace procedure chesnokov_se.speciality_by_doctor_id(in_id_doctor in number)
 as
     v_speciality_name specialties.speciality_name%type;
     cursor c_specialties_by_doctor is

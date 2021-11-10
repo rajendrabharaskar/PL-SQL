@@ -1,0 +1,35 @@
+create or replace procedure hospitals_of_specialty_id(in_id_specialty in number)
+as
+    v_hospital_name hospitals.hospital_name%type;
+    v_availability hospitals.availability%type;
+    v_id_doctor number;
+    v_type_name types_hospital.type_name%type;
+    v_begin_time working_time.begin_time%type;
+    v_end_time working_time.end_time%type;
+
+    cursor c_hospitals_of_specialty is
+        select hospitals.hospital_name, hospitals.availability, count(distinct doctors.id_doctor) as "количество врачей", types_hospital.type_name, working_time.begin_time, working_time.end_time
+            from chesnokov_se.hospitals
+            join chesnokov_se.doctors on hospitals.id_hospital = doctors.id_hospital
+            join chesnokov_se.doctor_specialties on doctors.id_doctor = doctor_specialties.id_doctor
+            join chesnokov_se.types_hospital on hospitals.id_type = types_hospital.id_type
+            join chesnokov_se.working_time on (hospitals.id_hospital = working_time.id_hospital) and (working_time.day = DAY_OF_WEEK())
+            where ((hospitals.delete_dt is null) and (doctor_specialties.id_specialty = 1)) and ((hospitals.id_hospital = in_id_specialty and in_id_specialty is not null) or in_id_specialty is null)
+            group by hospital_name, hospitals.availability, hospitals.hospital_name, types_hospital.id_type, types_hospital.type_name, working_time.begin_time, working_time.end_time
+            order by types_hospital.id_type, count(distinct doctors.id_doctor) desc, (case when to_char(sysdate, 'hh24:mi:ss') between to_char(working_time.begin_time, 'hh24:mi:ss') and to_char(working_time.end_time, 'hh24:mi:ss' ) then 1 else 2 end);
+
+begin
+    open c_hospitals_of_specialty;
+       loop
+       fetch c_hospitals_of_specialty into v_hospital_name, v_availability, v_id_doctor, v_type_name, v_begin_time, v_end_time ;
+          exit when c_hospitals_of_specialty%notfound;
+          dbms_output.put_line(v_hospital_name || ' ' || v_availability || ' ' || v_id_doctor || ' ' ||v_type_name || ' ' || to_char(v_begin_time, 'hh24:mi:ss') || ' ' || to_char(v_end_time, 'hh24:mi:ss'));
+       end loop;
+    close c_hospitals_of_specialty;
+end;
+
+
+
+begin
+    hospitals_of_specialty_id(3);
+end;
