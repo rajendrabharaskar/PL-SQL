@@ -1,0 +1,54 @@
+create or replace package pkg_all_documents as
+    function f_all_documents return sys_refcursor;
+    function f_all_documents(v_input_id number) return sys_refcursor;
+end;
+create or replace package body pkg_all_documents as
+    function f_all_documents
+        return sys_refcursor
+        as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        SELECT DOCUMENTS_NUMBERS.ID_PATIENT,DOCUMENTS.NAME ,DOCUMENTS_NUMBERS.VALUE
+        FROM DOCUMENTS_NUMBERS
+        join DOCUMENTS  on DOCUMENTS.ID_DOCUMENT = DOCUMENTS_NUMBERS.ID_DOCUMENT;
+        return cursor1;
+    end;
+
+    function f_all_documents(v_input_id number)
+        return sys_refcursor
+        as cursor1 sys_refcursor;
+    begin
+        open cursor1 for
+        SELECT DOCUMENTS_NUMBERS.ID_PATIENT,DOCUMENTS.NAME ,DOCUMENTS_NUMBERS.VALUE
+        FROM DOCUMENTS_NUMBERS
+        join DOCUMENTS  on DOCUMENTS.ID_DOCUMENT = DOCUMENTS_NUMBERS.ID_DOCUMENT
+        where DOCUMENTS_NUMBERS.ID_PATIENT = v_input_id;
+        return cursor1;
+    end;
+end;
+
+declare
+    v_id_patient DOCUMENTS_NUMBERS.ID_PATIENT%type;
+    v_name DOCUMENTS.name%type;
+    v_value DOCUMENTS_NUMBERS.value%type;
+    v_cursor1 sys_refcursor;
+    v_cursor2 sys_refcursor;
+begin
+    v_cursor1 := pkg_all_documents.f_all_documents();
+    v_cursor2 := pkg_all_documents.f_all_documents(1);
+        LOOP
+        FETCH v_cursor1 into v_id_patient, v_name, v_value;
+           EXIT WHEN v_cursor1%notfound;
+           dbms_output.put_line( v_id_patient || ' ' || v_name || ' ' || v_value);
+        END LOOP;
+    CLOSE v_cursor1;
+    dbms_output.put_line('------------------------------------------------');
+        LOOP
+        FETCH v_cursor2 into v_id_patient, v_name, v_value;
+           EXIT WHEN v_cursor2%notfound;
+           dbms_output.put_line( v_id_patient || ' ' || v_name || ' ' || v_value);
+        END LOOP;
+    CLOSE v_cursor2;
+end;
+
+
