@@ -1,0 +1,27 @@
+create or replace procedure chescnokov_se.doctors_of_hospital_id(
+    in_id_hospital number,
+    in_id_area number
+)
+as
+    v_doctor_name doctors.doctor_name%type;
+    v_id_hospital hospitals.id_hospital%type;
+    v_qualification_name qualifications.qualification_name%type;
+    v_area_name areas.area_name%type;
+    cursor c_doctors_of_hospital is
+        select doctors.doctor_name, doctors.id_hospital, qualifications.qualification_name, areas.area_name
+        from chesnokov_se.doctors
+        join chesnokov_se.qualifications on doctors.id_qualification = qualifications.id_qualification
+        join chesnokov_se.areas  on areas.id_area = doctors.id_area
+        where ((doctors.delete_dt is null) and (doctors.id_hospital = 1)) and ((doctors.id_doctor = in_id_hospital and in_id_hospital is not null) or in_id_hospital is null)
+        order by qualification_level desc, (case when doctors.id_area = in_id_area then 1 else 2 end);
+begin
+        open c_doctors_of_hospital;
+            loop
+            fetch c_doctors_of_hospital into v_doctor_name, v_id_hospital, v_qualification_name, v_area_name;
+               exit when c_doctors_of_hospital%notfound;
+               dbms_output.put_line(v_doctor_name || ' ' || v_id_hospital || ' ' || v_qualification_name || ' ' || v_area_name);
+            end loop;
+        close c_doctors_of_hospital;
+end;
+
+
