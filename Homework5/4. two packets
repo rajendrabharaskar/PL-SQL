@@ -1,0 +1,39 @@
+create or replace package pkg_example1 as
+    procedure procedure_pkg1_example1;
+    procedure procedure_pkg1_example2;
+end;
+
+create or replace package pkg_example2 as
+    procedure procedure_pkg2_example1;
+    procedure procedure_pkg2_example2;
+end;
+
+create or replace package body pkg_example1 as
+    procedure procedure_pkg1_example1 as
+    begin
+        dbms_output.put_line('run pkg1 proc1');
+        pkg_example2.procedure_pkg2_example2();
+    end;
+    procedure procedure_pkg1_example2 as
+    begin
+        dbms_output.put_line('run pkg1 proc2');
+    end;
+end;
+
+    create or replace package body pkg_example2 as
+    procedure procedure_pkg2_example1 as
+    begin
+        dbms_output.put_line('run pkg2 proc1');
+        pkg_example1.procedure_pkg1_example2();
+    end;
+    procedure procedure_pkg2_example2 as
+    begin
+        dbms_output.put_line('run pkg2 proc2');
+    end;
+end;
+
+begin
+    pkg_example1.procedure_pkg1_example1();
+    dbms_output.put_line('---------');
+    pkg_example2.procedure_pkg2_example1();
+end;

@@ -11,6 +11,12 @@ begin
 end;
 
 
+
+
+
+
+
+
 begin
     dbms_output.put_line(doctor_rating(4));
 end;
