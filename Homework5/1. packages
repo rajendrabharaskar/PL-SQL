@@ -1,38 +1,38 @@
 create or replace package chesnokov_se.pkg_checks as
-    function check_time(
+    function time(
         in_id_talon number,
         in_datetime date
     )
         return boolean;
 
-    function check_registr_for_talon(
+    function registr_for_talon(
         in_id_talon number
     )
         return boolean;
 
-    function  chesnokov_se.check_availability_talon(
+    function  availability_talon(
         in_id_talon number
     )
         return boolean;
 
-    function check_exist_policy_OMS(
+    function exist_policy_OMS(
         in_id_patient number
     )
         return boolean;
 
-    function check_gender(
+    function gender(
         in_id_patient number,
         in_id_speciality number
     )
         return boolean;
 
-    function check_age(
+    function age(
         in_id_patient number,
         in_id_speciality number
     )
         return boolean;
 
-    function check_deleted(
+    function deleted(
         in_id_talon number,
         in_id_speciality number
     )
@@ -40,7 +40,7 @@ create or replace package chesnokov_se.pkg_checks as
 end;
 
 create or replace package body chesnokov_se.pkg_checks as
-    function check_time(
+    function time(
         in_id_talon number,
         in_datetime date
     )
@@ -68,7 +68,7 @@ create or replace package body chesnokov_se.pkg_checks as
         return true;
     end;
 
-    function check_registr_for_talon(
+    function registr_for_talon(
         in_id_talon number
     )
         return boolean
@@ -82,7 +82,7 @@ create or replace package body chesnokov_se.pkg_checks as
         return not v_count > 0;
     end;
 
-    function check_availability_talon(
+    function availability_talon(
         in_id_talon number
     )
         return boolean
@@ -96,7 +96,7 @@ create or replace package body chesnokov_se.pkg_checks as
         return v_availability = 1;
     end;
 
-    function check_exist_policy_OMS(
+    function exist_policy_OMS(
         in_id_patient number
     )
         return boolean
@@ -110,7 +110,7 @@ create or replace package body chesnokov_se.pkg_checks as
         return v_count > 0;
     end;
 
-    function check_gender(
+    function gender(
         in_id_patient number,
         in_id_speciality number
     )
@@ -132,7 +132,7 @@ create or replace package body chesnokov_se.pkg_checks as
         return v_count > 0;
     end;
 
-    function check_age(
+    function age(
         in_id_patient number,
         in_id_speciality number
     )
@@ -165,7 +165,7 @@ create or replace package body chesnokov_se.pkg_checks as
         return v_age_patient between v_min_age and v_max_age;
     end;
 
-    function check_deleted(
+    function deleted(
         in_id_talon number,
         in_id_speciality number
     )
@@ -248,3 +248,4 @@ create or replace package body chesnokov_se.pkg_id as
         return v_id_hospital;
     end;
 end;
+

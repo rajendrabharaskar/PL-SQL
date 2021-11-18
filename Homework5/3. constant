@@ -1,0 +1,17 @@
+create or replace package chesnokov_se.pkg_constants as
+    function id_private_hospital
+        return number;
+end;
+
+create or replace package body chesnokov_se.pkg_constants as
+    function id_private_hospital
+        return number
+    as
+    begin
+        return 1;
+    end;
+end;
+
+select *
+    from chesnokov_se.HOSPITALS
+    where hospitals.id_type = pkg_constants.id_private_hospital;
