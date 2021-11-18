@@ -1,0 +1,250 @@
+create or replace package chesnokov_se.pkg_checks as
+    function check_time(
+        in_id_talon number,
+        in_datetime date
+    )
+        return boolean;
+
+    function check_registr_for_talon(
+        in_id_talon number
+    )
+        return boolean;
+
+    function  chesnokov_se.check_availability_talon(
+        in_id_talon number
+    )
+        return boolean;
+
+    function check_exist_policy_OMS(
+        in_id_patient number
+    )
+        return boolean;
+
+    function check_gender(
+        in_id_patient number,
+        in_id_speciality number
+    )
+        return boolean;
+
+    function check_age(
+        in_id_patient number,
+        in_id_speciality number
+    )
+        return boolean;
+
+    function check_deleted(
+        in_id_talon number,
+        in_id_speciality number
+    )
+        return boolean;
+end;
+
+create or replace package body chesnokov_se.pkg_checks as
+    function check_time(
+        in_id_talon number,
+        in_datetime date
+    )
+        return  boolean
+    as
+    talon_time_begin date;
+    talon_time_end date;
+    begin
+        give_talon_time(
+            in_id_talon => in_id_talon,
+            out_talon_time_begin => talon_time_begin,
+            out_talon_time_end => talon_time_end
+        );
+
+        if in_datetime not between talon_time_begin and talon_time_end
+            then
+                return false;
+        end if;
+
+        if talon_time_begin <= sysdate
+            then
+                return false;
+        end if;
+
+        return true;
+    end;
+
+    function check_registr_for_talon(
+        in_id_talon number
+    )
+        return boolean
+    as
+        v_count number;
+    begin
+        select count(chesnokov_se.journal.id_patient)
+            into v_count
+            from chesnokov_se.journal
+            where journal.id_talon = in_id_talon and journal.availability = 1;
+        return not v_count > 0;
+    end;
+
+    function check_availability_talon(
+        in_id_talon number
+    )
+        return boolean
+    as
+        v_availability number;
+    begin
+        select talons.availability
+            into v_availability
+            from chesnokov_se.talons
+            where talons.id_talon = in_id_talon;
+        return v_availability = 1;
+    end;
+
+    function check_exist_policy_OMS(
+        in_id_patient number
+    )
+        return boolean
+    as
+        v_count number;
+    begin
+        select count(documents_numbers.id_document_number)
+            into v_count
+            from chesnokov_se.documents_numbers
+            where documents_numbers.id_patient = in_id_patient and documents_numbers.id_document = 3;
+        return v_count > 0;
+    end;
+
+    function check_gender(
+        in_id_patient number,
+        in_id_speciality number
+    )
+        return boolean
+    as
+        v_id_gender_patient number;
+        v_count number;
+    begin
+        select patients.id_gender
+            into v_id_gender_patient
+            from chesnokov_se.patients
+            where patients.id_patient = in_id_patient;
+
+        select count(gender_specialties.id_gender)
+            into v_count
+            from chesnokov_se.gender_specialties
+            where gender_specialties.id_gender = v_id_gender_patient and gender_specialties.id_speciality = in_id_speciality;
+
+        return v_count > 0;
+    end;
+
+    function check_age(
+        in_id_patient number,
+        in_id_speciality number
+    )
+        return boolean
+    as
+        v_date_birth date;
+        v_age_patient number;
+        v_max_age number;
+        v_min_age number;
+    begin
+         select patients.date_birth
+            into v_date_birth
+            from chesnokov_se.patients
+            where patients.id_patient = in_id_patient;
+
+        select months_between(TRUNC(sysdate),v_date_birth)/12
+            into v_age_patient
+            from dual;
+
+        select specialties.required_min_age
+            into v_min_age
+            from chesnokov_se.specialties
+            where specialties.id_specialty = in_id_speciality;
+
+        select specialties.required_max_age
+            into v_max_age
+            from chesnokov_se.specialties
+            where specialties.id_specialty = in_id_speciality;
+
+        return v_age_patient between v_min_age and v_max_age;
+    end;
+
+    function check_deleted(
+        in_id_talon number,
+        in_id_speciality number
+    )
+        return boolean
+    as
+        v_id_doctor number;
+        v_id_hospital number;
+        v_deleted date;
+    begin
+        v_id_doctor := id_doctor_by_id_talon(in_id_talon);
+        v_id_hospital := id_hospital_by_id_doctor(v_id_doctor);
+
+        select doctors.delete_dt
+            into v_deleted
+            from chesnokov_se.doctors
+            where doctors.id_doctor = v_id_doctor;
+        if v_deleted is null
+           then return false;
+        end if;
+
+        select hospitals.delete_dt
+            into v_deleted
+            from chesnokov_se.hospitals
+            where hospitals.id_hospital = v_id_hospital;
+        if v_deleted is null
+           then return false;
+        end if;
+
+        select specialties.delete_dt
+            into v_deleted
+            from chesnokov_se.specialties
+            where specialties.id_specialty = in_id_speciality;
+        if v_deleted is null
+           then return false;
+        end if;
+
+        return true;
+    end;
+end;
+
+
+create or replace package chesnokov_se.pkg_id as
+    function doctor_by_id_talon(
+        in_id_talon number
+    )
+        return number;
+
+    function hospital_by_id_doctor(
+        in_id_doctor number
+    )
+        return  number;
+end;
+
+create or replace package body chesnokov_se.pkg_id as
+    function doctor_by_id_talon(
+        in_id_talon number
+    )
+        return number
+    as
+        v_id_doctor number;
+    begin
+        select talons.id_doctor
+            into v_id_doctor
+            from chesnokov_se.talons
+            where talons.id_talon = in_id_talon;
+        return v_id_doctor;
+    end;
+
+    function hospital_by_id_doctor(
+        in_id_doctor number
+    )
+        return  number
+    as
+        v_id_hospital number;
+    begin
+        select doctors.id_hospital
+            into v_id_hospital
+            from chesnokov_se.doctors
+            where doctors.id_doctor = in_id_doctor;
+        return v_id_hospital;
+    end;
+end;
