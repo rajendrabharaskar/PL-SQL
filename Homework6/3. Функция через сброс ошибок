@@ -1,0 +1,36 @@
+create or replace procedure chesnokov_se.check_gender_with_exception(
+    in_id_patient number,
+    in_id_speciality number
+)
+as
+    v_id_gender_patient number;
+    v_count number;
+begin
+    select patients.id_gender
+        into v_id_gender_patient
+        from chesnokov_se.patients
+        where patients.id_patient = in_id_patient;
+
+    select count(gender_specialties.id_gender)
+        into v_count
+        from chesnokov_se.gender_specialties
+        where gender_specialties.id_gender = v_id_gender_patient and gender_specialties.id_speciality = in_id_speciality;
+
+    if(v_count <= 0) then
+        dbms_standard.raise_application_error(-20000, 'Не подходящий пол пациента для данной специальности');
+    end if;
+end;
+
+
+begin
+    check_gender_with_exception(1,5);
+    dbms_output.put_line('12321312312312');
+end;
+
+/*При выполненнии программы и прохождении проверок, если проверка пройдена, то никаких ошибок не будет и программа продолжит выполняться.
+  Если проверка не проходит, то выбрасывается ошибка и выполнение программы прекращается.
+  Плюсы:
+    Не нужно возится с return
+    Удобнее выводить причину проблемы, из-за которой не проходит проверка.
+    Можно отлавливать эти ошибки и откатывать изменения через rollback, если ранее что-то менялось и менять что-то определённое, если возник необходимый тип ошибки
+ */
