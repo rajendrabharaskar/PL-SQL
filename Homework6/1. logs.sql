@@ -9,8 +9,8 @@ create table chesnokov_se.error_logs
     params varchar2(4000)
 )
 partition by range (sh_dt) (
-    partition part_1 values less than (to_date('24.02.2022 00:00', 'dd.mm.yyyy hh24:mi')),
-    partition part_max values less than (maxvalue)
+    partition error_logs_to_24_02_22 values less than (to_date('24.02.2022 00:00', 'dd.mm.yyyy hh24:mi')),
+    partition error_logs_max values less than (maxvalue)
 );
 
 --создание процедуры доавбления логов
@@ -49,14 +49,14 @@ end;
 select * from chesnokov_se.error_logs;
 
 --очистка секции логов
-alter table chesnokov_se.error_logs truncate partition part_1;
+alter table chesnokov_se.error_logs truncate partition error_logs_to_24_02_22;
 select * from chesnokov_se.error_logs;
 alter index SYS_C0029051 rebuild;
 
 --Добавление еще одной секции
 alter table chesnokov_se.error_logs
-    split partition part_max at (to_date('24.05.2022 00:00', 'dd.mm.yyyy hh24:mi'))
-        into (partition part_2, partition part_max);
+    split partition error_logs_max at (to_date('24.05.2022 00:00', 'dd.mm.yyyy hh24:mi'))
+        into (partition error_logs_to_24_05_22, partition error_logs_max);
 
 --Повторная вставка логов
 declare
