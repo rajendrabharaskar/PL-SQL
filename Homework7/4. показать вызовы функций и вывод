@@ -1,0 +1,7 @@
+declare
+    doc t_document := t_document(
+        'ИНН'
+    );
+begin
+    dbms_output.put_line(doc.get_name());
+end;
