@@ -347,6 +347,7 @@ create or replace type chesnokov_se.t_doctor as object(
         salary number,
         education varchar2
     ) return self as result,
+    member function get_id_doctor return number,
     member function get_id_hospital return number,
     member function get_id_area return number,
     member function get_id_qualification return number,
@@ -355,10 +356,11 @@ create or replace type chesnokov_se.t_doctor as object(
     member function get_education return varchar2
 );
 
-create sequence t_doctor_s;
+create sequence chesnokov_se.t_doctor_s;
 
 create or replace type body chesnokov_se.t_doctor
 as
+
     constructor function t_doctor(
         id_hospital number,
         id_area number,
@@ -410,7 +412,7 @@ as
         return self.salary;
     end;
 
-    member function get_education return number is
+    member function get_education return varchar2 is
     begin
         return self.education;
     end;
