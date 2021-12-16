@@ -5,11 +5,16 @@ create or replace type chesnokov_se.t_speciality is object
     required_min_age number,
     required_max_age number,
     delete_dt        date,
+    external_id number,
+    source number,
     constructor function t_speciality
     (
         speciality_name  varchar2,
-        required_min_age number,
-        required_max_age number
+        required_min_age number default 0,
+        required_max_age number default 150,
+        external_id number default null,
+        source number default null
+
     ) return self as result,
     member function get_id_speciality return number,
     member function get_speciality_name return varchar2,
@@ -23,8 +28,10 @@ create or replace type body chesnokov_se.t_speciality
 as
     constructor function t_speciality(
         speciality_name  varchar2,
-        required_min_age number,
-        required_max_age number
+        required_min_age number default 0,
+        required_max_age number default 150,
+        external_id number default null,
+        source number default null
     ) return self as result
     as
         next_id number := t_speciality_s.nextval;
@@ -34,6 +41,9 @@ as
         self.required_min_age := required_min_age;
         self.required_max_age := required_max_age;
         self.delete_dt := null;
+        self.external_id := external_id;
+        self.source := source;
+
         return;
     end;
 
@@ -338,6 +348,8 @@ create or replace type chesnokov_se.t_doctor as object(
     salary number,
     education varchar2(100),
     delete_dt date,
+    external_id number,
+    source number,
     constructor function t_doctor
     (
         id_hospital number,
@@ -345,7 +357,9 @@ create or replace type chesnokov_se.t_doctor as object(
         id_qualification number,
         doctor_name varchar2,
         salary number,
-        education varchar2
+        education varchar2,
+        external_id number default null,
+        source number default null
     ) return self as result,
     member function get_id_doctor return number,
     member function get_id_hospital return number,
@@ -367,7 +381,9 @@ as
         id_qualification number,
         doctor_name varchar2,
         salary number,
-        education varchar2
+        education varchar2,
+        external_id number default null,
+        source number default null
     ) return self as result
     as
         next_id number := t_doctor_s.nextval;
@@ -379,6 +395,8 @@ as
         self.doctor_name := doctor_name;
         self.salary := salary;
         self.education := education;
+        self.external_id := external_id;
+        self.source := source;
         return;
     end;
 
@@ -498,12 +516,16 @@ create or replace type chesnokov_se.t_hospital as object(
     id_type number,
     delete_dt date,
     availability number,
-    constructor function t_doctor
+    external_id number,
+    source number,
+    constructor function t_hospital
     (
         hospital_name varchar2,
-        id_organization number,
-        id_type number,
-        availability number
+        id_organization number default 11,
+        id_type number default 1,
+        availability number default 1,
+        external_id number,
+        source number
     ) return self as result,
     member function get_id_hospital return number,
     member function get_hospital_name return varchar2,
@@ -518,9 +540,11 @@ create or replace type body chesnokov_se.t_hospital
 as
     constructor function t_hospital(
         hospital_name varchar2,
-        id_organization number,
-        id_type number,
-        availability number
+        id_organization number default 11,
+        id_type number default 1,
+        availability number default 1,
+        external_id number,
+        source number
     ) return self as result
     as
         next_id number := t_hospital_s.nextval;
@@ -530,6 +554,8 @@ as
         self.id_organization := id_organization;
         self.id_type := id_type;
         self.availability := availability;
+        self.external_id := external_id;
+        self.source := source;
         return;
     end;
 
