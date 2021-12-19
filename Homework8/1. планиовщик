@@ -252,7 +252,7 @@ begin
                 select count(id_doctor)
                 into count_doctor
                 from chesnokov_se.doctors
-                where doctors.external_id =  v_item.external_id and doctors.source = 1;
+                where doctors.external_id =  v_item.external_id and doctors.source = 1; -- использовать Merge!!!
 
                 select SPECIALTIES.ID_SPECIALTY
                     into v_id_specialty
