@@ -8,7 +8,7 @@ as
     v_end_time working_time.end_time%type;
 
     cursor c_hospitals_of_specialty is
-        select h.hospital_name, h.availability, count(distinct d.id_doctor) as "количество врачей", th.type_name, wt.begin_time, wt.end_time
+        select h.hospital_name, h.availability, count(distinct d.id_doctor) as "Количество врачей", th.type_name, wt.begin_time, wt.end_time
             from chesnokov_se.hospitals h
             join chesnokov_se.doctors d on h.id_hospital = d.id_hospital
             join chesnokov_se.doctor_specialties ds on d.id_doctor = ds.id_doctor
