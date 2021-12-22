@@ -1,0 +1,25 @@
+create or replace procedure chesnokov_se.work_time(in_id_hospital in number)
+as
+    v_hospital_name chesnokov_se.hospitals.hospital_name%type;
+    v_day chesnokov_se.working_time.day%type;
+    v_begin_time chesnokov_se.working_time.begin_time%type;
+    v_end_time chesnokov_se.working_time.end_time%type;
+    cursor c_work_time is
+        select h.hospital_name, wt.day, wt.begin_time, wt.end_time
+        from chesnokov_se.hospitals h
+        join chesnokov_se.working_time wt on h.id_hospital = wt.id_hospital
+        where (h.id_hospital = in_id_hospital and in_id_hospital is not null) or in_id_hospital is null
+        order by h.hospital_name, wt.day;
+begin
+    open c_work_time;
+        loop
+        fetch c_work_time into v_hospital_name, v_day, v_begin_time, v_end_time;
+           exit when c_work_time%notfound;
+           dbms_output.put_line( v_hospital_name || ' ' || v_day || ' ' || v_begin_time || ' ' || v_end_time);
+        end loop;
+     close c_work_time;
+end;
+
+begin
+    chesnokov_se.work_time(1);
+end;

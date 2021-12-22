@@ -1,0 +1,24 @@
+create or replace procedure chesnokov_se.cities_of_region_by_id(in_id_region in number)
+as
+    v_region_name regions.region_name%type;
+    v_city_name cities.city_name%type;
+    cursor c_cities_by_region is
+        select r.region_name, c.city_name
+            from chesnokov_se.cities c
+            join chesnokov_se.regions r on r.id_region = c.id_region
+            where (r.id_region = in_id_region and in_id_region is not null) or in_id_region is null;
+begin
+    open c_cities_by_region;
+        loop
+        fetch c_cities_by_region into v_region_name, v_city_name;
+           exit when c_cities_by_region%notfound;
+           dbms_output.put_line(v_region_name || ' '  || v_city_name);
+        end loop;
+     close c_cities_by_region;
+end;
+
+begin
+    cities_of_region_by_id(null);
+end;
+
+

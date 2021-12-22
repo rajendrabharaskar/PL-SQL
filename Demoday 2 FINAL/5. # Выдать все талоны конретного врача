@@ -1,0 +1,20 @@
+create or replace procedure chesnokov_se.talons_of_doctor_by_id(in_id_doctor in number)
+as
+    v_id_talon chesnokov_se.talons.id_talon%type;
+    cursor c_talons_of_doctor_by_id is
+        select t.id_talon
+        from chesnokov_se.talons t
+        where (t.start_date >= sysdate) and ((t.id_doctor = in_id_doctor and in_id_doctor is not null) or in_id_doctor is null);
+begin
+    open c_talons_of_doctor_by_id;
+        loop
+        fetch c_talons_of_doctor_by_id into v_id_talon;
+           exit when c_talons_of_doctor_by_id%notfound;
+           dbms_output.put_line( v_id_talon);
+        end loop;
+     close c_talons_of_doctor_by_id;
+end;
+
+begin
+    chesnokov_se.talons_of_doctor_by_id(null);
+end;

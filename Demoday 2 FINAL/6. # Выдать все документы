@@ -1,0 +1,23 @@
+create or replace procedure chesnokov_se.all_documents_of_patient(in_id_patient in number)
+as
+    v_id_patient chesnokov_se.documents_numbers.id_patient%type;
+    v_name chesnokov_se.documents.name%type;
+    v_value chesnokov_se.documents_numbers.value%type;
+    cursor c_all_documents_of_patient is
+        select dn.id_patient,d.name ,dn.value
+        from chesnokov_se.documents_numbers dn
+        join chesnokov_se.documents d on d.id_document = dn.id_document
+        where (dn.id_patient = in_id_patient and in_id_patient is not null) or in_id_patient is null;
+begin
+    open c_all_documents_of_patient;
+        loop
+        fetch c_all_documents_of_patient into v_id_patient, v_name, v_value;
+           exit when c_all_documents_of_patient%notfound;
+           dbms_output.put_line( v_id_patient || ' ' || v_name || ' ' || v_value);
+        end loop;
+     close c_all_documents_of_patient;
+end;
+
+begin
+    chesnokov_se.all_documents_of_patient(1);
+end;

@@ -244,34 +244,62 @@ begin
         loop
             declare
                 v_item chesnokov_se.t_doctor := v_arr_doctor(i);
-                count_doctor number;
-                v_id_specialty number;
-                v_id_hospital number;
-                v_item_number number := external_id_specialty(i);
+                v_item_speciality number := external_id_specialty(i);
             begin
-                select count(id_doctor)
-                into count_doctor
-                from chesnokov_se.doctors
-                where doctors.external_id =  v_item.external_id and doctors.source = 1; -- использовать Merge!!!
 
-                select SPECIALTIES.ID_SPECIALTY
-                    into v_id_specialty
-                    from chesnokov_se.specialties
-                    where specialties.EXTERNAL_ID = v_item_number and source_id = 1;
+                merge into chesnokov_se.doctors d
+                USING (select
+                              id_hospital,
+                              id_area,
+                              id_qualification,
+                              doctor_name,
+                              salary,
+                              education,
+                              delete_dt,
+                              external_id,
+                              source
+                        from v_item) v
+                ON (d.external_id = v.external_id and d.source = v.source)
+                WHEN MATCHED
+                THEN UPDATE SET
+                                d.ID_HOSPITAL = v.ID_HOSPITAL,
+                                d.ID_AREA = v.ID_AREA,
+                                d.ID_QUALIFICATION = v.ID_QUALIFICATION,
+                                d.DOCTOR_NAME = v.DOCTOR_NAME,
+                                d.SALARY = v.SALARY,
+                                d.EDUCATION = v.EDUCATION,
+                                d.DELETE_DT = v.DELETE_DT
+                WHEN NOT MATCHED
+                THEN INSERT (id_hospital,
+                             id_area,
+                             id_qualification,
+                             doctor_name,
+                             salary,
+                             education,
+                             delete_dt,
+                             external_id,
+                             source)
+                VALUES ( v.id_hospital,
+                         v.id_area,
+                         v.id_qualification,
+                         v.doctor_name,
+                         v.salary,
+                         v.education,
+                         v.delete_dt,
+                         v.external_id,
+                         v.source);
 
-                select id_hospital
-                    into v_id_hospital
-                    from chesnokov_se.hospitals
-                    where hospitals.external_id = v_item.ID_HOSPITAL and source = 1;
 
-
-                if count_doctor = 0 then
-                    insert into chesnokov_se.doctors(id_hospital, id_area, id_qualification, doctor_name, salary, education, delete_dt, external_id, source)
-                        values (v_id_hospital, v_item.ID_AREA, v_item.ID_QUALIFICATION, v_item.DOCTOR_NAME, v_item.SALARY, v_item.EDUCATION, v_item.DELETE_DT, v_item.EXTERNAL_ID, v_item.SOURCE);
-                    insert into chesnokov_se.DOCTOR_SPECIALTIES(ID_DOCTOR, ID_SPECIALTY)
-                        values (v_item.ID_DOCTOR, v_id_specialty);
-                    commit;
-                end if;
+                merge into chesnokov_se.doctor_specialties ds
+                USING (select DOCTORS.ID_DOCTOR
+                       from chesnokov_se.doctors
+                       where doctors.EXTERNAL_ID = v_item.EXTERNAL_ID and doctors.SOURCE = v_item.SOURCE) v
+                ON (ds.ID_DOCTOR = v.ID_DOCTOR)
+                WHEN MATCHED
+                THEN UPDATE SET ds.ID_DOCTOR = v.ID_DOCTOR, ds.ID_SPECIALTY = v_item_speciality
+                WHEN NOT MATCHED
+                THEN INSERT (id_doctor, id_specialty)
+                VALUES (v.ID_DOCTOR, v_item_speciality);
             end;
         end loop;
     end if;
@@ -290,18 +318,20 @@ begin
         loop
             declare
                 v_item chesnokov_se.t_hospital := v_arr_hospital(i);
-                count_hospital number;
             begin
-                select count(id_hospital)
-                into count_hospital
-                from chesnokov_se.hospitals
-                where hospitals.external_id =  v_item.external_id and hospitals.source = v_item.source;
 
-                if count_hospital = 0 then
-                    insert into chesnokov_se.hospitals(hospital_name, id_organization, id_type, delete_dt, availability, external_id, source)
-                    values (v_item.HOSPITAL_NAME, v_item.ID_ORGANIZATION, v_item.ID_TYPE, v_item.DELETE_DT, v_item.AVAILABILITY, v_item.EXTERNAL_ID, v_item.SOURCE);
-                    commit;
-                end if;
+                merge into chesnokov_se.hospitals h
+                USING (select hospital_name, id_organization, id_type, delete_dt, availability, external_id, source from v_item) v
+                ON (h.EXTERNAL_ID = v.EXTERNAL_ID and h.SOURCE = v.EXTERNAL_ID)
+                WHEN MATCHED
+                THEN UPDATE SET h.HOSPITAL_NAME = v.HOSPITAL_NAME,
+                                h.ID_ORGANIZATION = v.ID_ORGANIZATION,
+                                h.ID_TYPE = v.ID_TYPE,
+                                h.DELETE_DT = v.DELETE_DT,
+                                h.AVAILABILITY = v.AVAILABILITY
+                WHEN NOT MATCHED
+                THEN INSERT (hospital_name, id_organization, id_type, delete_dt, availability, external_id, source)
+                VALUES (v.hospital_name, v.id_organization, v.id_type, v.delete_dt, v.availability, v.external_id, v.source);
             end;
         end loop;
     end if;
@@ -320,18 +350,20 @@ begin
         loop
             declare
                 v_item chesnokov_se.T_SPECIALITY := v_arr_speciality(i);
-                count_speciality number;
             begin
-                select count(ID_SPECIALTY)
-                into count_speciality
-                from chesnokov_se.SPECIALTIES
-                where SPECIALTIES.external_id =  v_item.external_id and SPECIALTIES.SOURCE_ID = v_item.source;
 
-                if count_speciality = 0 then
-                    insert into chesnokov_se.SPECIALTIES(SPECIALITY_NAME, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE, DELETE_DT, EXTERNAL_ID, SOURCE_ID)
-                    values (v_item.SPECIALITY_NAME, v_item.REQUIRED_MIN_AGE, v_item.REQUIRED_MAX_AGE, v_item.DELETE_DT, v_item.EXTERNAL_ID, v_item.SOURCE);
-                    commit;
-                end if;
+                merge into chesnokov_se.SPECIALTIES s
+                USING (select speciality_name, required_min_age, required_max_age, delete_dt, external_id, source_id from v_item) v
+                ON (s.EXTERNAL_ID = v.EXTERNAL_ID and s.SOURCE_ID = v.EXTERNAL_ID)
+                WHEN MATCHED
+                THEN UPDATE SET s.SPECIALITY_NAME = v.SPECIALITY_NAME,
+                                s.REQUIRED_MIN_AGE = v.REQUIRED_MIN_AGE,
+                                s.REQUIRED_MAX_AGE = v.REQUIRED_MAX_AGE,
+                                s.DELETE_DT = v.DELETE_DT
+                WHEN NOT MATCHED
+                THEN INSERT (SPECIALITY_NAME, REQUIRED_MIN_AGE, REQUIRED_MAX_AGE, DELETE_DT, EXTERNAL_ID, SOURCE_ID)
+                VALUES (v.SPECIALITY_NAME, v.REQUIRED_MIN_AGE, v.REQUIRED_MAX_AGE, v.DELETE_DT, v.EXTERNAL_ID, v.SOURCE_ID);
+
             end;
         end loop;
     end if;
@@ -357,7 +389,7 @@ begin
         job_class       => 'DEFAULT_JOB_CLASS',
         job_type        => 'PLSQL_BLOCK',
         job_action      => 'begin chesnokov_se.caching_doctors_action; end;',
-        comments        => 'Тестовая задача'
+        comments        => 'Кэширование'
     );
 end;
 
@@ -369,18 +401,3 @@ begin
         name      => 'chesnokov_se.caching'
     );
 end;
-/
-
-begin
-    sys.dbms_scheduler.disable(
-        name      => 'chesnokov_se.caching'
-    );
-end;
-
-begin
-    sys.dbms_scheduler.drop_job(
-        job_name      => 'chesnokov_se.caching'
-    );
-end;
-
-

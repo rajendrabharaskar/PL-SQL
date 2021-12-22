@@ -1,0 +1,35 @@
+create or replace procedure hospitals_of_specialty_id(in_id_specialty in number)
+as
+    v_hospital_name hospitals.hospital_name%type;
+    v_availability hospitals.availability%type;
+    v_id_doctor number;
+    v_type_name types_hospital.type_name%type;
+    v_begin_time working_time.begin_time%type;
+    v_end_time working_time.end_time%type;
+
+    cursor c_hospitals_of_specialty is
+        select h.hospital_name, h.availability, count(distinct d.id_doctor) as "количество врачей", th.type_name, wt.begin_time, wt.end_time
+            from chesnokov_se.hospitals h
+            join chesnokov_se.doctors d on h.id_hospital = d.id_hospital
+            join chesnokov_se.doctor_specialties ds on d.id_doctor = ds.id_doctor
+            join chesnokov_se.types_hospital th on h.id_type = th.id_type
+            join chesnokov_se.working_time wt on (h.id_hospital = wt.id_hospital) and (wt.day = day_of_week())
+            where ((h.delete_dt is null) and (ds.id_specialty = 1)) and ((h.id_hospital = in_id_specialty and in_id_specialty is not null) or in_id_specialty is null)
+            group by hospital_name, h.availability, h.hospital_name, th.id_type, th.type_name, wt.begin_time, wt.end_time
+            order by th.id_type, count(distinct d.id_doctor) desc, (case when to_char(sysdate, 'hh24:mi:ss') between to_char(wt.begin_time, 'hh24:mi:ss') and to_char(wt.end_time, 'hh24:mi:ss' ) then 1 else 2 end);
+
+begin
+    open c_hospitals_of_specialty;
+       loop
+       fetch c_hospitals_of_specialty into v_hospital_name, v_availability, v_id_doctor, v_type_name, v_begin_time, v_end_time ;
+          exit when c_hospitals_of_specialty%notfound;
+          dbms_output.put_line(v_hospital_name || ' ' || v_availability || ' ' || v_id_doctor || ' ' ||v_type_name || ' ' || to_char(v_begin_time, 'hh24:mi:ss') || ' ' || to_char(v_end_time, 'hh24:mi:ss'));
+       end loop;
+    close c_hospitals_of_specialty;
+end;
+
+
+
+begin
+    hospitals_of_specialty_id(3);
+end;

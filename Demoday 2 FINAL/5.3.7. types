@@ -1,0 +1,566 @@
+create or replace type chesnokov_se.t_speciality is object
+(
+    id_speciality    number,
+    speciality_name  varchar2(100),
+    required_min_age number,
+    required_max_age number,
+    delete_dt        date,
+    external_id number,
+    source number,
+    constructor function t_speciality
+    (
+        speciality_name  varchar2,
+        required_min_age number default 0,
+        required_max_age number default 150,
+        external_id number default null,
+        source number default null
+
+    ) return self as result
+);
+
+create sequence t_speciality_s;
+
+create or replace type body chesnokov_se.t_speciality
+as
+    constructor function t_speciality(
+        speciality_name  varchar2,
+        required_min_age number default 0,
+        required_max_age number default 150,
+        external_id number default null,
+        source number default null
+    ) return self as result
+    as
+        next_id number := t_speciality_s.nextval;
+    begin
+        self.id_speciality := next_id;
+        self.speciality_name := speciality_name;
+        self.required_min_age := required_min_age;
+        self.required_max_age := required_max_age;
+        self.delete_dt := null;
+        self.external_id := external_id;
+        self.source := source;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_speciality as table of chesnokov_se.t_speciality;
+
+
+
+create or replace type chesnokov_se.t_patient as object(
+    id_patient number,
+    surname_name varchar2(100),
+    name varchar2(100),
+    middle_name varchar2(100),
+    date_birth date,
+    id_gender number,
+    phone_number number,
+    id_area number,
+    id_user number,
+    constructor function t_patient
+    (
+        surname_name  varchar2,
+        name varchar2,
+        middle_name varchar2 default null,
+        date_birth date,
+        id_gender number,
+        phone_number number default null,
+        id_area number,
+        id_user number
+    ) return self as result
+);
+
+create sequence t_patient_s;
+
+create or replace type body chesnokov_se.t_patient
+as
+    constructor function t_patient(
+        surname_name  varchar2,
+        name varchar2,
+        middle_name varchar2 default null,
+        date_birth date,
+        id_gender number,
+        phone_number number default null,
+        id_area number,
+        id_user number
+    ) return self as result
+    as
+        next_id number := t_patient_s.nextval;
+    begin
+        self.id_patient := next_id;
+        self.surname_name := surname_name;
+        self.name := name;
+        self.middle_name := middle_name;
+        self.date_birth := date_birth;
+        self.id_gender := id_gender;
+        self.phone_number := phone_number;
+        self.id_area := id_area;
+        self.id_user := id_user;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_patient as table of chesnokov_se.t_patient;
+
+
+
+create or replace type chesnokov_se.t_document as object
+(
+    id_document number,
+    name varchar2(100),
+    constructor function t_document(
+        name varchar2
+    ) return self as result
+);
+
+create sequence t_document_s;
+
+create or replace type body chesnokov_se.t_document
+as
+    constructor function t_document(
+        name  varchar2
+    ) return self as result
+    as
+        next_id number := t_document_s.nextval;
+    begin
+        self.id_document := next_id;
+        self.name := name;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_document as table of chesnokov_se.t_document;
+
+
+
+create or replace type chesnokov_se.t_document_number as object(
+    id_document_number number,
+    id_patient number,
+    id_document number,
+    value_doc varchar2(100),
+    constructor function t_document_number
+    (
+        id_patient number,
+        id_document number,
+        value_doc varchar2
+    ) return self as result
+);
+
+create sequence t_document_number_s;
+
+create or replace type body chesnokov_se.t_document_number
+as
+    constructor function t_document_number(
+        id_patient number,
+        id_document number,
+        value_doc varchar2
+    ) return self as result
+    as
+        next_id number := t_document_number_s.nextval;
+    begin
+        self.id_document_number := next_id;
+        self.id_patient := id_patient;
+        self.id_document := id_document;
+        self.value_doc := value_doc;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_document_number as table of chesnokov_se.t_document_number;
+
+
+
+create or replace type chesnokov_se.t_patient_extendend as object(
+    patient t_patient,
+    document_number t_document_number,
+    constructor function t_patient_extendend
+    (
+        patient t_patient,
+        document_number t_document_number
+    ) return self as result,
+    constructor function t_patient_extendend
+    (
+        surname_name  varchar2,
+        name varchar2,
+        middle_name varchar2 default null,
+        date_birth date,
+        id_gender number,
+        phone_number number default null,
+        id_area number,
+        id_user number,
+        id_document_number number,
+        id_patient number,
+        id_document number,
+        value_doc varchar2
+    ) return self as result
+);
+
+create or replace type body chesnokov_se.t_patient_extendend
+as
+    constructor function t_patient_extendend(
+        patient t_patient,
+        document_number t_document_number
+    ) return self as result
+    as
+    begin
+        self.patient := patient;
+        self.document_number := document_number;
+        return;
+    end;
+
+    constructor function t_patient_extendend(
+        surname_name  varchar2,
+        name varchar2,
+        middle_name varchar2 default null,
+        date_birth date,
+        id_gender number,
+        phone_number number default null,
+        id_area number,
+        id_user number,
+        id_document_number number,
+        id_patient number,
+        id_document number,
+        value_doc varchar2
+    ) return self as result
+    as
+    begin
+        self.patient := chesnokov_se.t_patient(
+            surname_name,
+            name,
+            middle_name,
+            date_birth,
+            id_gender,
+            phone_number,
+            id_area,
+            id_user
+        );
+        self.document_number := t_document_number(
+            id_document_number,
+            id_patient,
+            id_document,
+            value_doc
+        );
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_patient_extendend as table of chesnokov_se.t_patient_extendend;
+
+
+
+create or replace type chesnokov_se.t_doctor as object(
+    id_doctor number,
+    id_hospital number,
+    id_area number,
+    id_qualification number,
+    doctor_name varchar2(100),
+    salary number,
+    education varchar2(100),
+    delete_dt date,
+    external_id number,
+    source number,
+    constructor function t_doctor
+    (
+        id_hospital number,
+        id_area number,
+        id_qualification number,
+        doctor_name varchar2,
+        salary number,
+        education varchar2,
+        external_id number default null,
+        source number default null
+    ) return self as result
+);
+
+create sequence chesnokov_se.t_doctor_s;
+
+create or replace type body chesnokov_se.t_doctor
+as
+
+    constructor function t_doctor(
+        id_hospital number,
+        id_area number,
+        id_qualification number,
+        doctor_name varchar2,
+        salary number,
+        education varchar2,
+        external_id number default null,
+        source number default null
+    ) return self as result
+    as
+        next_id number := t_doctor_s.nextval;
+    begin
+        self.id_doctor := next_id;
+        self.id_hospital := id_hospital;
+        self.id_area := id_area;
+        self.id_qualification := id_qualification;
+        self.doctor_name := doctor_name;
+        self.salary := salary;
+        self.education := education;
+        self.external_id := external_id;
+        self.source := source;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_doctor as table of chesnokov_se.t_doctor;
+
+
+
+create or replace type chesnokov_se.t_qualification as object(
+    id_qualification number,
+    qualification_name varchar2(100),
+    qualification_level number,
+    constructor function t_qualification
+    (
+        qualification_name varchar2,
+        qualification_level number
+    ) return self as result
+);
+
+create sequence t_qualification_s;
+
+create or replace type body chesnokov_se.t_qualification
+as
+    constructor function t_qualification(
+        qualification_name varchar2,
+        qualification_level number
+    ) return self as result
+    as
+        next_id number := t_qualification_s.nextval;
+    begin
+        self.id_qualification := next_id;
+        self.qualification_name:= qualification_name;
+        self.qualification_level := qualification_level;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_qualification as table of chesnokov_se.t_qualification;
+
+
+
+create or replace type chesnokov_se.t_doctor_extended as object(
+    doctor t_doctor,
+    qualification t_qualification,
+    constructor function t_doctor_extended
+    (
+        doctor t_doctor,
+        qualification t_qualification
+    ) return self as result
+);
+
+create or replace type body chesnokov_se.t_doctor_extended
+as
+    constructor function t_doctor_extended(
+        doctor t_doctor,
+        qualification t_qualification
+    ) return self as result
+    as
+    begin
+        self.doctor := doctor;
+        self.qualification := qualification;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_doctor_extended as table of chesnokov_se.t_doctor_extended;
+
+
+
+create or replace type chesnokov_se.t_hospital as object(
+    id_hospital number,
+    hospital_name varchar2(100),
+    id_organization number,
+    id_type number,
+    delete_dt date,
+    availability number,
+    external_id number,
+    source number,
+    constructor function t_hospital
+    (
+        hospital_name varchar2,
+        id_organization number default 11,
+        id_type number default 1,
+        availability number default 1,
+        external_id number,
+        source number
+    ) return self as result
+);
+
+create sequence t_hospital_s;
+
+create or replace type body chesnokov_se.t_hospital
+as
+    constructor function t_hospital(
+        hospital_name varchar2,
+        id_organization number default 11,
+        id_type number default 1,
+        availability number default 1,
+        external_id number,
+        source number
+    ) return self as result
+    as
+        next_id number := t_hospital_s.nextval;
+    begin
+        self.id_hospital := next_id;
+        self.hospital_name := hospital_name;
+        self.id_organization := id_organization;
+        self.id_type := id_type;
+        self.availability := availability;
+        self.external_id := external_id;
+        self.source := source;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_hospital as table of chesnokov_se.t_hospital;
+
+
+
+create or replace type chesnokov_se.t_working_time as object(
+    id_time number,
+    day number,
+    begin_time timestamp,
+    end_time timestamp,
+    id_hospital number,
+    constructor function t_working_time
+    (
+        day number,
+        begin_time timestamp,
+        end_time timestamp,
+        id_hospital number
+    ) return self as result
+);
+
+create sequence t_working_time_s;
+
+create or replace type body chesnokov_se.t_working_time
+as
+    constructor function t_working_time(
+        day number,
+        begin_time timestamp,
+        end_time timestamp,
+        id_hospital number
+    ) return self as result
+    as
+        next_id number := t_working_time_s.nextval;
+    begin
+        self.id_time := next_id;
+        self.day := day;
+        self.begin_time := begin_time;
+        self.end_time := end_time;
+        self.id_hospital := id_hospital;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_working_time as table of chesnokov_se.t_working_time;
+
+
+
+create or replace type chesnokov_se.t_hospital_extended as object(
+    hospital t_hospital,
+    working_time t_working_time,
+    constructor function t_hospital_extended
+    (
+        hospital t_hospital,
+        working_time t_working_time
+    ) return self as result
+);
+
+create or replace type body chesnokov_se.t_hospital_extended
+as
+    constructor function t_hospital_extended(
+        hospital t_hospital,
+        working_time t_working_time
+    ) return self as result
+    as
+    begin
+        self.hospital := hospital;
+        self.working_time := working_time;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_hospital_extended as table of chesnokov_se.t_hospital_extended;
+
+
+
+create or replace type chesnokov_se.t_talon as object(
+    id_talon number,
+    delete_dt date,
+    start_date date,
+    end_date date,
+    id_doctor number,
+    availability number,
+    constructor function t_talon
+    (
+        start_date date,
+        end_date date,
+        id_doctor number
+    ) return self as result
+);
+
+create sequence t_talon_s;
+
+create or replace type body chesnokov_se.t_talon
+as
+    constructor function t_talon(
+        start_date date,
+        end_date date,
+        id_doctor number
+    ) return self as result
+    as
+        next_id number := t_talon_s.nextval;
+    begin
+        self.id_talon := next_id;
+        self.start_date := start_date;
+        self.end_date := end_date;
+        self.id_doctor := id_doctor;
+        self.availability := 1;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_talon as table of chesnokov_se.t_talon;
+
+
+
+create or replace type chesnokov_se.t_journal as object(
+    id_journal number,
+    id_patient number,
+    datetime date,
+    id_talon number,
+    delete_dt date,
+    availability number,
+    constructor function t_journal
+    (
+        id_patient number,
+        datetime date,
+        id_talon number
+    ) return self as result
+);
+
+create sequence t_journal_s;
+
+create or replace type body chesnokov_se.t_journal
+as
+    constructor function t_journal(
+        id_patient number,
+        datetime date,
+        id_talon number
+    ) return self as result
+    as
+        next_id number := t_journal_s.nextval;
+    begin
+        self.id_journal := next_id;
+        self.id_patient := id_patient;
+        self.datetime := datetime;
+        self.id_talon := id_talon;
+        self.availability := 1;
+        return;
+    end;
+end;
+
+create or replace type chesnokov_se.t_arr_journal as table of chesnokov_se.t_journal;

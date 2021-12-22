@@ -1,0 +1,23 @@
+create or replace procedure chesnokov_se.journal_of_patient(in_id_patientl in number)
+as
+    v_id_patient chesnokov_se.journal.id_patient%type;
+    v_datetime chesnokov_se.journal.datetime%type;
+    v_id_talon chesnokov_se.journal.id_talon%type;
+    v_availability chesnokov_se.journal.availability%type;
+    cursor c_journal_of_patient is
+        select j.id_patient, j.datetime, j.id_talon, j.availability
+        from chesnokov_se.journal j
+        where (j.id_patient = in_id_patientl and in_id_patientl is not null) or in_id_patientl is null;
+begin
+    open c_journal_of_patient;
+        loop
+        fetch c_journal_of_patient into v_id_patient, v_datetime, v_id_talon, v_availability;
+           exit when c_journal_of_patient%notfound;
+           dbms_output.put_line(v_id_patient || ' ' || v_datetime || ' ' || v_id_talon || ' ' || v_availability);
+        end loop;
+    close c_journal_of_patient;
+end;
+
+begin
+    chesnokov_se.journal_of_patient(1);
+end;
