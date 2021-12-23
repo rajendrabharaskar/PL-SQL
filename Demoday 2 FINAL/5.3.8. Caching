@@ -1,0 +1,403 @@
+create or replace package chesnokov_se.pkg_code
+as
+    function ok
+        return number;
+
+    function error
+        return number;
+end;
+
+create or replace package body chesnokov_se.pkg_code as
+    function ok
+        return number is
+    begin
+        return 0;
+    end;
+
+    function error
+        return number is
+    begin
+        return 200;
+    end;
+end;
+
+
+create or replace function chesnokov_se.indent(n number)
+return varchar2
+as
+    v_indent varchar2(4000);
+begin
+    for i in 1..n loop
+        v_indent := v_indent||'     ';
+    end loop;
+    return v_indent;
+end;
+
+
+
+create or replace type chesnokov_se.t_arr_doctor as table of chesnokov_se.t_doctor;
+
+create or replace type chesnokov_se.t_arr_hospitals as table of chesnokov_se.t_hospital;
+
+create or replace type chesnokov_se.t_arr_speciality as table of chesnokov_se.t_speciality;
+
+create or replace type chesnokov_se.t_arr_number as table of number;
+
+
+
+create or replace function chesnokov_se.repository_doctors(
+    out_result out number
+)
+return clob
+as
+    v_success boolean;
+    v_code number;
+    v_clob clob;
+begin
+    v_clob := chesnokov_se.http_fetch(
+        p_url => 'http://virtserver.swaggerhub.com/antonovad/doctordb/1.0.0/doctors',
+        p_debug => false,
+        out_success => v_success,
+        out_code => v_code
+    );
+    out_result := case when v_success
+        then chesnokov_se.pkg_code.ok
+        else chesnokov_se.pkg_code.error
+    end;
+    return v_clob;
+end;
+
+create or replace function chesnokov_se.repository_hospitals(
+    out_result out number
+)
+return clob
+as
+    v_success boolean;
+    v_code number;
+    v_clob clob;
+begin
+    v_clob := chesnokov_se.http_fetch(
+        p_url => 'http://virtserver.swaggerhub.com/antonovad/doctordb/1.0.0/hospitals',
+        p_debug => false,
+        out_success => v_success,
+        out_code => v_code
+    );
+    out_result := case when v_success
+        then chesnokov_se.pkg_code.ok
+        else chesnokov_se.pkg_code.error
+    end;
+    return v_clob;
+end;
+
+create or replace function chesnokov_se.repository_speciality(
+    out_result out number
+)
+return clob
+as
+    v_success boolean;
+    v_code number;
+    v_clob clob;
+begin
+    v_clob := chesnokov_se.http_fetch(
+        p_url => 'http://virtserver.swaggerhub.com/antonovad/doctordb/1.0.0/specialties',
+        p_debug => false,
+        out_success => v_success,
+        out_code => v_code
+    );
+    out_result := case when v_success
+        then chesnokov_se.pkg_code.ok
+        else chesnokov_se.pkg_code.error
+    end;
+    return v_clob;
+end;
+
+
+create or replace function chesnokov_se.service_doctors(
+    out_result out number,
+    out_external_id_specialty out t_arr_number
+)
+return chesnokov_se.t_arr_doctor
+as
+
+    v_result integer;
+    v_clob clob;
+    v_response chesnokov_se.t_arr_doctor := chesnokov_se.t_arr_doctor();
+    v_external_id_specialty chesnokov_se.t_arr_number := chesnokov_se.t_arr_number();
+begin
+
+    v_clob := chesnokov_se.repository_doctors(
+        out_result => v_result
+    );
+
+    select chesnokov_se.t_doctor(
+        id_hospital => r.id_hospital,
+        id_area => null,
+        id_qualification => null,
+        doctor_name => r.lname || ' ' || r.fname || ' '|| r.lname,
+        salary => null,
+        education => null,
+        external_id => r.id_doctor,
+        source => 1
+    )
+    bulk collect into v_response
+    from json_table(v_clob, '$' columns(
+        nested path '$[*]' columns(
+            id_doctor number path '$.id_doctor',
+            id_hospital number path '$.id_hospital',
+            lname varchar2(100) path '$.lname',
+            fname varchar2(100) path '$.fname',
+            mname varchar2(100) path '$.mname'
+    ))) r;
+    select b.id_specialty
+    bulk collect into v_external_id_specialty
+    from json_table(v_clob, '$' columns(
+        nested path '$[*]' columns(
+            id_specialty number path '$.id_specialty'
+    ))) b;
+    out_result := v_result;
+    out_external_id_specialty := v_external_id_specialty;
+    return v_response;
+end;
+
+create or replace function chesnokov_se.service_hospitals(
+    out_result out number
+)
+return chesnokov_se.t_arr_hospitals
+as
+
+    v_result integer;
+    v_clob clob;
+    v_response chesnokov_se.t_arr_hospitals := chesnokov_se.t_arr_hospitals();
+
+begin
+
+    v_clob := chesnokov_se.repository_hospitals(
+        out_result => v_result
+    );
+
+    select chesnokov_se.t_hospital(
+        hospital_name  => r.name,
+        id_organization => 11,
+        id_type => 1,
+        availability => 1,
+        external_id => r.id_hospital,
+        source => 1
+    )
+    bulk collect into v_response
+    from json_table(v_clob, '$' columns(
+        nested path '$[*]' columns(
+            id_hospital number path '$.id_hospital',
+            name varchar2(100) path '$.name'
+    ))) r;
+    out_result := v_result;
+    return v_response;
+
+end;
+
+create or replace function chesnokov_se.service_speciality(
+    out_result out number
+)
+return chesnokov_se.t_arr_speciality
+as
+
+    v_result integer;
+    v_clob clob;
+    v_response chesnokov_se.t_arr_speciality := chesnokov_se.t_arr_speciality();
+
+begin
+
+    v_clob := chesnokov_se.repository_speciality(
+        out_result => v_result
+    );
+
+    select chesnokov_se.t_speciality(
+        speciality_name  => r.name,
+        required_min_age => 0,
+        required_max_age => 150,
+        external_id => r.external_id,
+        source => 1
+    )
+    bulk collect into v_response
+    from json_table(v_clob, '$' columns(
+        nested path '$[*]' columns(
+            external_id number path '$.id_specialty',
+            name varchar2(100) path '$.name'
+    ))) r;
+    out_result := v_result;
+    return v_response;
+end;
+
+
+create or replace procedure chesnokov_se.caching_doctors
+as
+    v_result integer;
+    v_arr_doctor chesnokov_se.t_arr_doctor := chesnokov_se.t_arr_doctor();
+    external_id_specialty chesnokov_se.t_arr_number := chesnokov_se.t_arr_number();
+begin
+
+     v_arr_doctor := chesnokov_se.service_doctors(
+        out_result => v_result,
+        out_external_id_specialty => external_id_specialty
+    );
+    if v_arr_doctor.count>0 then
+    for i in v_arr_doctor.first..v_arr_doctor.last
+        loop
+            declare
+                v_item chesnokov_se.t_doctor := v_arr_doctor(i);
+                v_item_speciality number := external_id_specialty(i);
+            begin
+
+                merge into chesnokov_se.doctors d
+                using (select
+                              id_hospital,
+                              id_area,
+                              id_qualification,
+                              doctor_name,
+                              salary,
+                              education,
+                              delete_dt,
+                              external_id,
+                              source
+                        from v_item) v
+                on (d.external_id = v.external_id and d.source = v.source)
+                when matched
+                then update set
+                                d.id_hospital = v.id_hospital,
+                                d.id_area = v.id_area,
+                                d.id_qualification = v.id_qualification,
+                                d.doctor_name = v.doctor_name,
+                                d.salary = v.salary,
+                                d.education = v.education,
+                                d.delete_dt = v.delete_dt
+                when not matched
+                then insert (id_hospital,
+                             id_area,
+                             id_qualification,
+                             doctor_name,
+                             salary,
+                             education,
+                             delete_dt,
+                             external_id,
+                             source)
+                values ( v.id_hospital,
+                         v.id_area,
+                         v.id_qualification,
+                         v.doctor_name,
+                         v.salary,
+                         v.education,
+                         v.delete_dt,
+                         v.external_id,
+                         v.source);
+
+
+                merge into chesnokov_se.doctor_specialties ds
+                using (select d.id_doctor
+                       from chesnokov_se.doctors d
+                       where d.external_id = v_item.external_id and d.source = v_item.source) v
+                on (ds.id_doctor = v.id_doctor)
+                when matched
+                then update set ds.id_doctor = v.id_doctor, ds.id_specialty = v_item_speciality
+                when not matched
+                then insert (id_doctor, id_specialty)
+                values (v.id_doctor, v_item_speciality);
+            end;
+        end loop;
+    end if;
+end;
+
+create or replace procedure chesnokov_se.caching_hospitals
+as
+    v_result integer;
+    v_arr_hospital chesnokov_se.t_arr_hospitals := chesnokov_se.t_arr_hospitals();
+begin
+    v_arr_hospital := chesnokov_se.service_hospitals(
+        out_result => v_result
+    );
+    if v_arr_hospital.count>0 then
+    for i in v_arr_hospital.first..v_arr_hospital.last
+        loop
+            declare
+                v_item chesnokov_se.t_hospital := v_arr_hospital(i);
+            begin
+
+                merge into chesnokov_se.hospitals h
+                using (select hospital_name, id_organization, id_type, delete_dt, availability, external_id, source from v_item) v
+                on (h.external_id = v.external_id and h.source = v.external_id)
+                when matched
+                then update set h.hospital_name = v.hospital_name,
+                                h.id_organization = v.id_organization,
+                                h.id_type = v.id_type,
+                                h.delete_dt = v.delete_dt,
+                                h.availability = v.availability
+                when not matched
+                then insert (hospital_name, id_organization, id_type, delete_dt, availability, external_id, source)
+                values (v.hospital_name, v.id_organization, v.id_type, v.delete_dt, v.availability, v.external_id, v.source);
+            end;
+        end loop;
+    end if;
+end;
+
+create or replace procedure chesnokov_se.caching_speciality
+as
+    v_result integer;
+    v_arr_speciality chesnokov_se.t_arr_speciality := chesnokov_se.t_arr_speciality();
+begin
+    v_arr_speciality := chesnokov_se.service_speciality(
+        out_result => v_result
+    );
+    if v_arr_speciality.count>0 then
+    for i in v_arr_speciality.first..v_arr_speciality.last
+        loop
+            declare
+                v_item chesnokov_se.t_speciality := v_arr_speciality(i);
+            begin
+
+                merge into chesnokov_se.specialties s
+                using (select speciality_name, required_min_age, required_max_age, delete_dt, external_id, source_id from v_item) v
+                on (s.external_id = v.external_id and s.source_id = v.external_id)
+                when matched
+                then update set s.speciality_name = v.speciality_name,
+                                s.required_min_age = v.required_min_age,
+                                s.required_max_age = v.required_max_age,
+                                s.delete_dt = v.delete_dt
+                when not matched
+                then insert (speciality_name, required_min_age, required_max_age, delete_dt, external_id, source_id)
+                values (v.speciality_name, v.required_min_age, v.required_max_age, v.delete_dt, v.external_id, v.source_id);
+
+            end;
+        end loop;
+    end if;
+end;
+
+
+
+
+create or replace procedure chesnokov_se.caching
+as
+begin
+    chesnokov_se.caching_speciality();
+    chesnokov_se.caching_hospitals();
+    chesnokov_se.caching_doctors();
+end;
+
+begin
+    sys.dbms_scheduler.create_job(
+        job_name        => 'chesnokov_se.caching',
+        start_date      => to_timestamp_tz('2021/12/01 14:00:00.000000 +07:00','yyyy/mm/dd hh24:mi:ss.ff tzh:tzm'),
+        repeat_interval => 'freq=hourly;interval=1;',
+        end_date        => null,
+        job_class       => 'default_job_class',
+        job_type        => 'plsql_block',
+        job_action      => 'begin chesnokov_se.caching_doctors_action; end;',
+        comments        => 'кэширование'
+    );
+end;
+
+
+select * from user_scheduler_jobs;
+
+begin
+    sys.dbms_scheduler.enable(
+        name      => 'chesnokov_se.caching'
+    );
+end;

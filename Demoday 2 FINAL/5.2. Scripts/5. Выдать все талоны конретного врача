@@ -1,20 +1,24 @@
-create or replace procedure chesnokov_se.talons_of_doctor_by_id(in_id_doctor in number)
+create or replace procedure chesnokov_se.id_talons_of_doctor_by_id(in_id_doctor in number)
 as
-    v_id_talon chesnokov_se.talons.id_talon%type;
-    cursor c_talons_of_doctor_by_id is
-        select t.id_talon
+    type t_arr_id_talon is table of chesnokov_se.talons.id_talon%type;
+    v_arr_id_talon t_arr_id_talon;
+begin
+    select t.id_talon
+        bulk collect into v_arr_id_talon
         from chesnokov_se.talons t
         where (t.start_date >= sysdate) and ((t.id_doctor = in_id_doctor and in_id_doctor is not null) or in_id_doctor is null);
-begin
-    open c_talons_of_doctor_by_id;
+    if v_arr_id_talon.count>0 then
+        for i in v_arr_id_talon.first..v_arr_id_talon.last
         loop
-        fetch c_talons_of_doctor_by_id into v_id_talon;
-           exit when c_talons_of_doctor_by_id%notfound;
-           dbms_output.put_line( v_id_talon);
+            declare
+                v_item chesnokov_se.talons.id_talon%type := v_arr_id_talon(i);
+            begin
+                dbms_output.put_line(v_item);
+            end;
         end loop;
-     close c_talons_of_doctor_by_id;
+    end if;
 end;
 
 begin
-    chesnokov_se.talons_of_doctor_by_id(null);
+    chesnokov_se.id_talons_of_doctor_by_id(1);
 end;

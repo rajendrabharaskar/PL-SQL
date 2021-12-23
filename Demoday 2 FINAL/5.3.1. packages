@@ -1,0 +1,42 @@
+create or replace package chesnokov_se.pkg_id as
+    function doctor_by_id_talon(
+        in_id_talon number
+    )
+        return number;
+
+    function hospital_by_id_doctor(
+        in_id_doctor number
+    )
+        return  number;
+end;
+
+create or replace package body chesnokov_se.pkg_id as
+    function doctor_by_id_talon(
+        in_id_talon number
+    )
+        return number
+    as
+        v_id_doctor number;
+    begin
+        select t.id_doctor
+            into v_id_doctor
+            from chesnokov_se.talons t
+            where t.id_talon = in_id_talon;
+        return v_id_doctor;
+    end;
+
+    function hospital_by_id_doctor(
+        in_id_doctor number
+    )
+        return  number
+    as
+        v_id_hospital number;
+    begin
+        select d.id_hospital
+            into v_id_hospital
+            from chesnokov_se.doctors d
+            where d.id_doctor = in_id_doctor;
+        return v_id_hospital;
+    end;
+end;
+
