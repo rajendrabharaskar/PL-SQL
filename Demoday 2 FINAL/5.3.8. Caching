@@ -35,11 +35,7 @@ end;
 
 
 
-create or replace type chesnokov_se.t_arr_doctor as table of chesnokov_se.t_doctor;
 
-create or replace type chesnokov_se.t_arr_hospitals as table of chesnokov_se.t_hospital;
-
-create or replace type chesnokov_se.t_arr_speciality as table of chesnokov_se.t_speciality;
 
 create or replace type chesnokov_se.t_arr_number as table of number;
 
